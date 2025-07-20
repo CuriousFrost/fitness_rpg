@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../models/workout_entry.dart';
 import '../models/character_class.dart';
 import '../main.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class HistoryScreen extends StatefulWidget {
   const HistoryScreen({super.key});

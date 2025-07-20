@@ -3,7 +3,6 @@ import '../models/character_class.dart';
 import '../models/workout_entry.dart';
 import '../widgets/workout_input_dialog.dart';
 import '../main.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class WorkoutScreen extends StatefulWidget {
   const WorkoutScreen({super.key});

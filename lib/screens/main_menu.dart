@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'character_screen.dart';
 import 'workout_screen.dart';
 import 'history_screen.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class MainMenu extends StatefulWidget {
   const MainMenu({super.key});

@@ -3,7 +3,6 @@ import '../models/character_class.dart';
 import 'workout_screen.dart';
 import '../widgets/xp_progress_bar.dart';
 import '../main.dart';
-import'package:shared_preferences/shared_preferences.dart';
 
 class CharacterScreen extends StatefulWidget {
   const CharacterScreen({super.key});

@@ -5,6 +5,7 @@ import '../models/character_class.dart';
 
 // Updated workout_data.dart
 
+
 class WorkoutData {
   final List<WorkoutEntry> _entries = [];
   final Map<CharacterClass, int> _characterXp = {
@@ -12,6 +13,7 @@ class WorkoutData {
   };
 
   List<WorkoutEntry> get entries => _entries;
+
   Map<CharacterClass, int> get characterXp => _characterXp;
 
   void addWorkout(WorkoutEntry entry) {
@@ -26,7 +28,8 @@ class WorkoutData {
     if (index != -1) {
       _entries[index] = newEntry;
       _characterXp[oldEntry.characterClass] =
-          ((_characterXp[oldEntry.characterClass] ?? 0) - oldEntry.xp).clamp(0, double.infinity).toInt();
+          ((_characterXp[oldEntry.characterClass] ?? 0) - oldEntry.xp).clamp(
+              0, double.infinity).toInt();
       _characterXp[newEntry.characterClass] =
           (_characterXp[newEntry.characterClass] ?? 0) + newEntry.xp;
       save();
@@ -36,7 +39,8 @@ class WorkoutData {
   void deleteWorkout(WorkoutEntry entry) {
     _entries.remove(entry);
     _characterXp[entry.characterClass] =
-        ((_characterXp[entry.characterClass] ?? 0) - entry.xp).clamp(0, double.infinity).toInt();
+        ((_characterXp[entry.characterClass] ?? 0) - entry.xp).clamp(
+            0, double.infinity).toInt();
     save();
   }
 
@@ -57,25 +61,33 @@ class WorkoutData {
       final List decoded = jsonDecode(jsonString);
       _entries.clear();
       _entries.addAll(decoded.map((e) => WorkoutEntry.fromJson(e)).toList());
-    } else {
-      _entries.clear(); // <- ensure no leftover data
+    }
+
+    // Always initialize all character XP to 0
+    _characterXp.clear();
+    for (var c in CharacterClass.values) {
+      _characterXp[c] = 0;
     }
 
     final xpString = prefs.getString('characterXp');
     if (xpString != null) {
       final Map<String, dynamic> decoded = jsonDecode(xpString);
       _characterXp.clear();
+
       for (var entry in decoded.entries) {
-        final classEnum = CharacterClass.values.firstWhere(
-              (e) => e.toString() == entry.key,
-          orElse: () => CharacterClass.bloodletter,
-        );
-        _characterXp[classEnum] = entry.value;
-      }
-    } else {
-      _characterXp.clear(); // <- ensure we reset if nothing is saved
-      for (var c in CharacterClass.values) {
-        _characterXp[c] = 0;
+        CharacterClass? classEnum;
+        try {
+          classEnum = CharacterClass.values.firstWhere(
+                (e) => e.toString() == entry.key,
+            orElse: () => CharacterClass.values.first, // fallback, avoids null
+          );
+        } catch (_) {
+          continue; // skip corrupted entries
+        }
+
+        final rawXp = entry.value;
+        final safeXp = (rawXp is int && rawXp >= 0) ? rawXp : 0;
+        _characterXp[classEnum] = safeXp;
       }
     }
   }
