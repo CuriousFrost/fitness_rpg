@@ -30,6 +30,7 @@ class _CharacterScreenState extends State<CharacterScreen> {
           );
         },
       ),
+
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           await Navigator.push(
@@ -40,6 +41,7 @@ class _CharacterScreenState extends State<CharacterScreen> {
         },
         child: const Icon(Icons.fitness_center),
       ),
+
     );
   }
 }

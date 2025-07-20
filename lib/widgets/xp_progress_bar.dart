@@ -20,8 +20,10 @@ class XPProgressBar extends StatelessWidget {
     final int level = getLevelFromXp(xp);
     final int currentLevelXp = xpForLevel(level);
     final int nextLevelXp = xpForLevel(level + 1);
-    final int xpIntoLevel = xp - currentLevelXp;
     final int xpForNext = nextLevelXp - currentLevelXp;
+
+    final int rawXpIntoLevel = xp - currentLevelXp;
+    final int xpIntoLevel = rawXpIntoLevel.clamp(0, xpForNext);
     final double progress = (xpIntoLevel / xpForNext).clamp(0.0, 1.0);
 
     return Column(

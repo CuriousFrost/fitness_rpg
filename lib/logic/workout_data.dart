@@ -56,6 +56,7 @@ class WorkoutData {
   Future<void> load() async {
     final prefs = await SharedPreferences.getInstance();
 
+    // Load workouts
     final jsonString = prefs.getString('workouts');
     if (jsonString != null) {
       final List decoded = jsonDecode(jsonString);
@@ -63,32 +64,27 @@ class WorkoutData {
       _entries.addAll(decoded.map((e) => WorkoutEntry.fromJson(e)).toList());
     }
 
-    // Always initialize all character XP to 0
+    // Reset XP map to 0
     _characterXp.clear();
     for (var c in CharacterClass.values) {
       _characterXp[c] = 0;
     }
 
+    // Load XP values if present
     final xpString = prefs.getString('characterXp');
     if (xpString != null) {
       final Map<String, dynamic> decoded = jsonDecode(xpString);
-      _characterXp.clear();
-
       for (var entry in decoded.entries) {
-        CharacterClass? classEnum;
         try {
-          classEnum = CharacterClass.values.firstWhere(
+          final classEnum = CharacterClass.values.firstWhere(
                 (e) => e.toString() == entry.key,
-            orElse: () => CharacterClass.values.first, // fallback, avoids null
+            orElse: () => CharacterClass.bloodletter, // fallback
           );
+          _characterXp[classEnum] = (entry.value as int?) ?? 0;
         } catch (_) {
-          continue; // skip corrupted entries
+          // Silently skip bad data
         }
-
-        final rawXp = entry.value;
-        final safeXp = (rawXp is int && rawXp >= 0) ? rawXp : 0;
-        _characterXp[classEnum] = safeXp;
       }
     }
   }
-}
+  }
