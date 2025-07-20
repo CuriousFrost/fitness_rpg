@@ -5,7 +5,8 @@ class XPProgressBar extends StatelessWidget {
   final int xp;
   const XPProgressBar({super.key, required this.xp});
 
-  int xpForLevel(int level) => (80 * pow(level, 1.3)).floor();
+  int xpForLevel(int level) => level == 1 ? 0 : (80 * pow(level, 1.3)).floor();
+
 
   int getLevelFromXp(int xp) {
     int level = 1;
