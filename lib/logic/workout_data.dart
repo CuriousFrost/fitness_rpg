@@ -4,7 +4,7 @@ import 'package:fitness_rpg/models/workout_entry.dart';
 import '../models/character_class.dart';
 
 // Updated workout_data.dart
-
+const int maxXpTotal = 152960;
 
 class WorkoutData {
   final List<WorkoutEntry> _entries = [];
@@ -21,6 +21,9 @@ class WorkoutData {
     _characterXp[entry.characterClass] =
         (_characterXp[entry.characterClass] ?? 0) + entry.xp;
     save();
+    if (_characterXp[entry.characterClass]! > maxXpTotal) {
+      _characterXp[entry.characterClass] = maxXpTotal;
+    }
   }
 
   void updateWorkout(WorkoutEntry oldEntry, WorkoutEntry newEntry) {
@@ -49,14 +52,14 @@ class WorkoutData {
     final jsonString = jsonEncode(_entries.map((e) => e.toJson()).toList());
     await prefs.setString('workouts', jsonString);
 
-    final xpMap = _characterXp.map((k, v) => MapEntry(k.toString(), v));
+    final xpMap = _characterXp.map((k, v) => MapEntry(k.name, v));
     await prefs.setString('characterXp', jsonEncode(xpMap));
   }
 
-  Future<void> load() async {
+  Future<void> load({bool resetXp = false}) async {
     final prefs = await SharedPreferences.getInstance();
 
-    // Load workouts
+    // Load workout entries
     final jsonString = prefs.getString('workouts');
     if (jsonString != null) {
       final List decoded = jsonDecode(jsonString);
@@ -64,25 +67,26 @@ class WorkoutData {
       _entries.addAll(decoded.map((e) => WorkoutEntry.fromJson(e)).toList());
     }
 
-    // Reset XP map to 0
+    // Load XP or reset conditionally
     _characterXp.clear();
     for (var c in CharacterClass.values) {
       _characterXp[c] = 0;
     }
 
-    // Load XP values if present
-    final xpString = prefs.getString('characterXp');
-    if (xpString != null) {
-      final Map<String, dynamic> decoded = jsonDecode(xpString);
-      for (var entry in decoded.entries) {
-        try {
-          final classEnum = CharacterClass.values.firstWhere(
-                (e) => e.toString() == entry.key,
-            orElse: () => CharacterClass.bloodletter, // fallback
-          );
-          _characterXp[classEnum] = (entry.value as int?) ?? 0;
-        } catch (_) {
-          // Silently skip bad data
+    if (!resetXp) {
+      final xpString = prefs.getString('characterXp');
+      if (xpString != null) {
+        final Map<String, dynamic> decoded = jsonDecode(xpString);
+        for (var entry in decoded.entries) {
+          try {
+            final classEnum = CharacterClass.values.firstWhere(
+                  (e) => e.name == entry.key,
+              orElse: () => CharacterClass.bloodletter,
+            );
+            _characterXp[classEnum] = entry.value;
+          } catch (_) {
+            // Optionally log ignored enum value
+          }
         }
       }
     }

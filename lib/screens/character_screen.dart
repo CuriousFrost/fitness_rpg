@@ -22,7 +22,6 @@ class _CharacterScreenState extends State<CharacterScreen> {
         itemBuilder: (context, index) {
           final characterClass = CharacterClass.values[index];
           final xp = workoutData.characterXp[characterClass] ?? 0;
-
           return ListTile(
             title: Text(characterClass.displayName),
             subtitle: XPProgressBar(xp: xp),
