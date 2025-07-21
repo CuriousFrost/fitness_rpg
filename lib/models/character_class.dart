@@ -1,4 +1,3 @@
-
 enum CharacterClass {
   bloodletter,
   airsnatcher,

@@ -3,7 +3,11 @@
 import '../models/workout_entry.dart';
 
 class MathHelper {
-  static int calculateXp(WorkoutType type, double primary, [int secondary = 1]) {
+  static int calculateXp(
+    WorkoutType type,
+    double primary, [
+    int secondary = 1,
+  ]) {
     switch (type) {
       case WorkoutType.running:
         return (primary * 10).ceil();
@@ -24,7 +28,11 @@ class MathHelper {
     }
   }
 
-  static String buildDescription(WorkoutType type, double primary, [int secondary = 1]) {
+  static String buildDescription(
+    WorkoutType type,
+    double primary, [
+    int secondary = 1,
+  ]) {
     switch (type) {
       case WorkoutType.running:
         return 'Ran ${primary.toStringAsFixed(1)} km';

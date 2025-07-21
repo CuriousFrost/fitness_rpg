@@ -1,3 +1,4 @@
+import 'package:fitness_rpg/utils/ui_helpers.dart';
 import 'package:flutter/material.dart';
 import '../models/character_class.dart';
 import '../models/workout_entry.dart';
@@ -17,16 +18,23 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
   @override
   void initState() {
     super.initState();
-    final stored = PageStorage.of(context).readState(context, identifier: 'selectedClass') as String?;
+    final stored =
+        PageStorage.of(context).readState(context, identifier: 'selectedClass')
+            as String?;
     if (stored != null) {
-      selectedClass = CharacterClass.values.firstWhere((c) => c.name == stored, orElse: () => CharacterClass.values.first);
+      selectedClass = CharacterClass.values.firstWhere(
+        (c) => c.name == stored,
+        orElse: () => CharacterClass.values.first,
+      );
     }
   }
 
   void _onClassChanged(CharacterClass? newValue) {
     setState(() {
       selectedClass = newValue;
-      PageStorage.of(context).writeState(context, newValue?.name, identifier: 'selectedClass');
+      PageStorage.of(
+        context,
+      ).writeState(context, newValue?.name, identifier: 'selectedClass');
     });
   }
 
@@ -35,9 +43,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
     final List<CharacterClass> classNames = CharacterClass.values;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Workout'),
-      ),
+      appBar: AppBar(title: const Text('Workout')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -46,7 +52,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
             DropdownButton<CharacterClass>(
               key: const PageStorageKey<String>('classDropdown'),
               value: selectedClass,
-              hint: const Text('Select a class'),
+              hint: const Text('Select a Visionary'),
               isExpanded: true,
               onChanged: _onClassChanged,
               items: classNames.map((c) {
@@ -64,27 +70,37 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                 showDialog(
                   context: context,
                   builder: (context) => WorkoutInputDialog(
-                      onWorkoutLogged: (workoutType, description, xp) {
-                        if (selectedClass == null) return;
+                          onWorkoutLogged: (workoutType, description, xp) async {
+                            if (selectedClass == null) return;
+                                                       final entry = WorkoutEntry(
+                              characterClass: selectedClass!,
+                              type: workoutType,
+                              xp: xp,
+                              description: description,
+                              timestamp: DateTime.now(),
+                            );
 
-                        final entry = WorkoutEntry(
-                          characterClass: selectedClass!,
-                          type: workoutType,
-                          xp: xp,
-                          description: description,
-                          timestamp: DateTime.now(),
-                        );
+                            final oldXp = workoutData.characterXp[selectedClass!] ?? 0;
 
-                        workoutData.entries.add(entry);
-                        workoutData.characterXp[selectedClass!] =
-                            (workoutData.characterXp[selectedClass!] ?? 0) + xp;
-                        workoutData.save();
+                            workoutData.entries.add(entry);
+                            workoutData.characterXp[selectedClass!] = oldXp + xp;
+                            await workoutData.save(); // Wait for save to complete
 
-                        setState(() {});
-                      },
-                  ),
-                );
-              },
+                            setState(() {}); // Trigger UI update first
+                            // Delay popup until after UI rebuild + XP data update
+                            WidgetsBinding.instance.addPostFrameCallback((_) {
+                              final updatedXp = workoutData.characterXp[selectedClass!] ?? 0;
+                              showXpGainPopupWithBar(
+                                context,
+                                selectedClass!,
+                                oldXp,
+                                updatedXp,
+                              );
+                            });
+                          },
+                        ),
+                      );
+                    },
               child: const Text('Log Workout'),
             ),
           ],

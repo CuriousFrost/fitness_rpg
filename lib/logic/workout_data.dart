@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fitness_rpg/models/workout_entry.dart';
 import '../models/character_class.dart';
 
+
 // Updated workout_data.dart
 const int maxXpTotal = 152960;
 
@@ -31,8 +32,9 @@ class WorkoutData {
     if (index != -1) {
       _entries[index] = newEntry;
       _characterXp[oldEntry.characterClass] =
-          ((_characterXp[oldEntry.characterClass] ?? 0) - oldEntry.xp).clamp(
-              0, double.infinity).toInt();
+          ((_characterXp[oldEntry.characterClass] ?? 0) - oldEntry.xp)
+              .clamp(0, double.infinity)
+              .toInt();
       _characterXp[newEntry.characterClass] =
           (_characterXp[newEntry.characterClass] ?? 0) + newEntry.xp;
       save();
@@ -42,8 +44,9 @@ class WorkoutData {
   void deleteWorkout(WorkoutEntry entry) {
     _entries.remove(entry);
     _characterXp[entry.characterClass] =
-        ((_characterXp[entry.characterClass] ?? 0) - entry.xp).clamp(
-            0, double.infinity).toInt();
+        ((_characterXp[entry.characterClass] ?? 0) - entry.xp)
+            .clamp(0, double.infinity)
+            .toInt();
     save();
   }
 
@@ -80,7 +83,7 @@ class WorkoutData {
         for (var entry in decoded.entries) {
           try {
             final classEnum = CharacterClass.values.firstWhere(
-                  (e) => e.name == entry.key,
+              (e) => e.name == entry.key,
               orElse: () => CharacterClass.bloodletter,
             );
             _characterXp[classEnum] = entry.value;
@@ -91,4 +94,4 @@ class WorkoutData {
       }
     }
   }
-  }
+}

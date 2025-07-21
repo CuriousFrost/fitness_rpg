@@ -7,7 +7,6 @@ class XPProgressBar extends StatelessWidget {
 
   int xpForLevel(int level) => level == 1 ? 0 : (80 * pow(level, 1.3)).floor();
 
-
   int getLevelFromXp(int xp) {
     int level = 1;
     while (level < 150 && xp >= xpForLevel(level + 1)) {
@@ -30,15 +29,20 @@ class XPProgressBar extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        LinearProgressIndicator(
-          value: progress,
-          backgroundColor: Colors.grey[700],
-          color: Colors.greenAccent,
-          minHeight: 10,
+        ClipRRect(
+          borderRadius: BorderRadius.circular(10),
+          child: LinearProgressIndicator(
+            value: progress,
+            minHeight: 12,
+            backgroundColor: Colors.grey[800],
+            valueColor: const AlwaysStoppedAnimation<Color>(Colors.tealAccent),
+          ),
         ),
-        const SizedBox(height: 4),
-        Text('Level $level • $xpIntoLevel / $xpForNext XP',
-            style: const TextStyle(fontSize: 12)),
+        const SizedBox(height: 6),
+        Text(
+          'Level $level • $xpIntoLevel / $xpForNext XP',
+          style: const TextStyle(fontSize: 13),
+        ),
       ],
     );
   }

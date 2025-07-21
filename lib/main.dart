@@ -1,9 +1,9 @@
+import 'package:fitness_rpg/screens/visionary_screen.dart';
 import 'package:flutter/material.dart';
 import 'screens/main_menu.dart';
 import '../models/character_data.dart';
 import '../logic/workout_data.dart';
 //import 'package:shared_preferences/shared_preferences.dart';
-
 
 // 🔹 Add this:
 final PageStorageBucket pageStorageBucket = PageStorageBucket();
@@ -16,6 +16,7 @@ void main() async {
   await workoutData.load();
   runApp(const FitnessRPGApp());
 }
+
 final workoutData = WorkoutData();
 
 class FitnessRPGApp extends StatelessWidget {
@@ -25,13 +26,13 @@ class FitnessRPGApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+      routes: {
+        '/visionary': (context) => const CharacterScreen(),
+      },
       title: 'Fitness RPG',
       theme: ThemeData.dark(),
       // 🔹 Wrap your root screen with PageStorage
-      home: PageStorage(
-        bucket: pageStorageBucket,
-        child: MainMenu(),
-      ),
+      home: PageStorage(bucket: pageStorageBucket, child: MainMenu()),
     );
   }
 }

@@ -12,7 +12,6 @@ class HistoryScreen extends StatefulWidget {
 }
 
 class _HistoryScreenState extends State<HistoryScreen> {
-
   CharacterClass? _selectedClassFilter;
   String selectedFilter = 'Newest';
 
@@ -23,7 +22,11 @@ class _HistoryScreenState extends State<HistoryScreen> {
     'Lowest XP',
   ];
 
-  void showEditWorkoutDialog(BuildContext context, int index, WorkoutEntry entry) {
+  void showEditWorkoutDialog(
+    BuildContext context,
+    int index,
+    WorkoutEntry entry,
+  ) {
     final TextEditingController distanceController = TextEditingController();
     final TextEditingController repsController = TextEditingController();
     final TextEditingController weightController = TextEditingController();
@@ -31,7 +34,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
     bool isDistanceBased = [
       WorkoutType.walking,
       WorkoutType.running,
-      WorkoutType.biking
+      WorkoutType.biking,
     ].contains(entry.type);
 
     showDialog(
@@ -46,24 +49,18 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 TextField(
                   controller: distanceController,
                   keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(
-                    labelText: 'Distance (km)',
-                  ),
+                  decoration: const InputDecoration(labelText: 'Distance (km)'),
                 )
               else ...[
                 TextField(
                   controller: repsController,
                   keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(
-                    labelText: 'Repetitions',
-                  ),
+                  decoration: const InputDecoration(labelText: 'Repetitions'),
                 ),
                 TextField(
                   controller: weightController,
                   keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(
-                    labelText: 'Weight (lbs)',
-                  ),
+                  decoration: const InputDecoration(labelText: 'Weight (lbs)'),
                 ),
               ],
             ],
@@ -79,7 +76,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 String newDescription;
 
                 if (isDistanceBased) {
-                  final double distance = double.tryParse(distanceController.text) ?? 0;
+                  final double distance =
+                      double.tryParse(distanceController.text) ?? 0;
                   newXp = (entry.type == WorkoutType.running)
                       ? (distance * 10).round()
                       : (entry.type == WorkoutType.walking)
@@ -108,12 +106,17 @@ class _HistoryScreenState extends State<HistoryScreen> {
                       multiplier = 0.3;
                   }
                   newXp = (weight * reps * multiplier).round();
-                  newDescription = entry.type.generateDescription(weight.toDouble(), reps);
+                  newDescription = entry.type.generateDescription(
+                    weight.toDouble(),
+                    reps,
+                  );
                 }
 
                 final int oldXp = entry.xp;
                 workoutData.characterXp[entry.characterClass] =
-                    (workoutData.characterXp[entry.characterClass] ?? 0) - oldXp + newXp;
+                    (workoutData.characterXp[entry.characterClass] ?? 0) -
+                    oldXp +
+                    newXp;
                 if (workoutData.characterXp[entry.characterClass]! < 0) {
                   workoutData.characterXp[entry.characterClass] = 0;
                 }
@@ -178,7 +181,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   child: DropdownButton<CharacterClass>(
                     value: _selectedClassFilter,
                     isExpanded: true,
-                    hint: const Text('Filter by Class'),
+                    hint: const Text('Filter by Visionary'),
                     onChanged: (newClass) {
                       setState(() => _selectedClassFilter = newClass);
                     },
@@ -214,74 +217,90 @@ class _HistoryScreenState extends State<HistoryScreen> {
             Expanded(
               child: filteredHistory.isNotEmpty
                   ? ListView.builder(
-                itemCount: filteredHistory.length,
-                itemBuilder: (context, index) {
-                  final entry = filteredHistory[index];
-                  final actualIndex = workoutData.entries.indexOf(entry);
+                      itemCount: filteredHistory.length,
+                      itemBuilder: (context, index) {
+                        final entry = filteredHistory[index];
+                        final actualIndex = workoutData.entries.indexOf(entry);
 
-                  return Dismissible(
-                    key: Key(entry.timestamp.toIso8601String()),
-                    background: Container(
-                      color: Colors.blue,
-                      alignment: Alignment.centerLeft,
-                      padding: const EdgeInsets.only(left: 20),
-                      child: const Icon(Icons.edit, color: Colors.white),
-                    ),
-                    secondaryBackground: Container(
-                      color: Colors.red,
-                      alignment: Alignment.centerRight,
-                      padding: const EdgeInsets.only(right: 20),
-                      child: const Icon(Icons.delete, color: Colors.white),
-                    ),
-                    confirmDismiss: (direction) async {
-                      if (direction == DismissDirection.startToEnd) {
-                        showEditWorkoutDialog(context, actualIndex, entry);
-                        return false;
-                      } else if (direction == DismissDirection.endToStart) {
-                        final confirmed = await showDialog<bool>(
-                          context: context,
-                          builder: (context) => AlertDialog(
-                            title: const Text('Delete Workout'),
-                            content: const Text('Are you sure you want to delete this workout?'),
-                            actions: [
-                              TextButton(
-                                onPressed: () => Navigator.pop(context, false),
-                                child: const Text('Cancel'),
-                              ),
-                              TextButton(
-                                onPressed: () => Navigator.pop(context, true),
-                                child: const Text('Delete'),
-                              ),
-                            ],
+                        return Dismissible(
+                          key: Key(entry.timestamp.toIso8601String()),
+                          background: Container(
+                            color: Colors.blue,
+                            alignment: Alignment.centerLeft,
+                            padding: const EdgeInsets.only(left: 20),
+                            child: const Icon(Icons.edit, color: Colors.white),
                           ),
-                        ) ??
-                            false;
+                          secondaryBackground: Container(
+                            color: Colors.red,
+                            alignment: Alignment.centerRight,
+                            padding: const EdgeInsets.only(right: 20),
+                            child: const Icon(
+                              Icons.delete,
+                              color: Colors.white,
+                            ),
+                          ),
+                          confirmDismiss: (direction) async {
+                            if (direction == DismissDirection.startToEnd) {
+                              showEditWorkoutDialog(
+                                context,
+                                actualIndex,
+                                entry,
+                              );
+                              return false;
+                            } else if (direction ==
+                                DismissDirection.endToStart) {
+                              final confirmed =
+                                  await showDialog<bool>(
+                                    context: context,
+                                    builder: (context) => AlertDialog(
+                                      title: const Text('Delete Workout'),
+                                      content: const Text(
+                                        'Are you sure you want to delete this workout?',
+                                      ),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () =>
+                                              Navigator.pop(context, false),
+                                          child: const Text('Cancel'),
+                                        ),
+                                        TextButton(
+                                          onPressed: () =>
+                                              Navigator.pop(context, true),
+                                          child: const Text('Delete'),
+                                        ),
+                                      ],
+                                    ),
+                                  ) ??
+                                  false;
 
-                        if (confirmed) {
-                          setState(() {
-                            final xp = entry.xp;
-                            final classKey = entry.characterClass;
-                            workoutData.characterXp[classKey] =
-                                (workoutData.characterXp[classKey] ?? 0) - xp;
-                            if (workoutData.characterXp[classKey]! < 0) {
-                              workoutData.characterXp[classKey] = 0;
+                              if (confirmed) {
+                                setState(() {
+                                  final xp = entry.xp;
+                                  final classKey = entry.characterClass;
+                                  workoutData.characterXp[classKey] =
+                                      (workoutData.characterXp[classKey] ?? 0) -
+                                      xp;
+                                  if (workoutData.characterXp[classKey]! < 0) {
+                                    workoutData.characterXp[classKey] = 0;
+                                  }
+                                  final entryToDelete =
+                                      workoutData.entries[actualIndex];
+                                  workoutData.deleteWorkout(entryToDelete);
+                                });
+                                return true;
+                              }
                             }
-                            final entryToDelete = workoutData.entries[actualIndex];
-                            workoutData.deleteWorkout(entryToDelete);                          });
-                          return true;
-                        }
-                      }
-                      return false;
-                    },
-                    child: ListTile(
-                      title: Text(entry.description),
-                      subtitle: Text(
-                        '${entry.type.displayName} • ${entry.xp} XP • ${entry.timestamp.toLocal().toString().split('.')[0]}',
-                      ),
-                    ),
-                  );
-                },
-              )
+                            return false;
+                          },
+                          child: ListTile(
+                            title: Text(entry.description),
+                            subtitle: Text(
+                              '${entry.type.displayName} • ${entry.xp} XP • ${entry.timestamp.toLocal().toString().split('.')[0]}',
+                            ),
+                          ),
+                        );
+                      },
+                    )
                   : const Center(child: Text('No workouts logged yet.')),
             ),
           ],

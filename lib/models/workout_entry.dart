@@ -81,8 +81,9 @@ class WorkoutEntry {
   };
 
   factory WorkoutEntry.fromJson(Map<String, dynamic> json) => WorkoutEntry(
-    characterClass:
-    CharacterClass.values.firstWhere((e) => e.name == json['characterClass']),
+    characterClass: CharacterClass.values.firstWhere(
+      (e) => e.name == json['characterClass'],
+    ),
     type: WorkoutType.values.firstWhere((e) => e.name == json['type']),
     description: json['description'],
     xp: json['xp'],

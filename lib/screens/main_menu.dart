@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'character_screen.dart';
+import 'visionary_screen.dart';
 import 'workout_screen.dart';
 import 'history_screen.dart';
 
@@ -11,7 +11,6 @@ class MainMenu extends StatefulWidget {
 }
 
 class _MainMenuState extends State<MainMenu> {
-
   int _selectedIndex = 0;
 
   final List<Widget> _screens = const [
@@ -28,8 +27,11 @@ class _MainMenuState extends State<MainMenu> {
         currentIndex: _selectedIndex,
         onTap: (index) => setState(() => _selectedIndex = index),
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.fitness_center), label: 'Workout'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Character'),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.fitness_center),
+            label: 'Workout',
+          ),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Visionary'),
           BottomNavigationBarItem(icon: Icon(Icons.history), label: 'History'),
         ],
       ),
