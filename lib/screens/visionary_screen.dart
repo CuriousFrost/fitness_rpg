@@ -3,6 +3,7 @@ import '../models/character_class.dart';
 import 'workout_screen.dart';
 import '../widgets/xp_progress_bar.dart';
 import '../main.dart';
+import '../screens/visionary_stats_screen.dart';
 
 class CharacterScreen extends StatefulWidget {
   const CharacterScreen({super.key});
@@ -21,31 +22,41 @@ class _CharacterScreenState extends State<CharacterScreen> {
         itemBuilder: (context, index) {
           final characterClass = CharacterClass.values[index];
           final xp = workoutData.characterXp[characterClass] ?? 0;
-
-          return Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 16.0,
-              vertical: 8.0,
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  characterClass.displayName,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
+          return InkWell(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      VisionaryStatsScreen(characterClass: characterClass),
+                ),
+              );
+            },
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16.0,
+                vertical: 8.0,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    characterClass.displayName,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 4),
-                XPProgressBar(xp: xp),
-                const SizedBox(height: 6),
-                Text(
-                  'Total: $xp XP',
-                  style: const TextStyle(fontSize: 12, color: Colors.grey),
-                ),
-                const Divider(thickness: 1, height: 20),
-              ],
+                  const SizedBox(height: 4),
+                  XPProgressBar(xp: xp),
+                  const SizedBox(height: 6),
+                  Text(
+                    'Total: $xp XP',
+                    style: const TextStyle(fontSize: 12, color: Colors.grey),
+                  ),
+                  const Divider(thickness: 1, height: 20),
+                ],
+              ),
             ),
           );
         },

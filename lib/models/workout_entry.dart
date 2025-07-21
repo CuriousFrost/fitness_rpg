@@ -63,6 +63,7 @@ class WorkoutEntry {
   String description;
   int xp;
   final DateTime timestamp;
+  final double? distance;
 
   WorkoutEntry({
     required this.characterClass,
@@ -70,6 +71,7 @@ class WorkoutEntry {
     required this.description,
     required this.xp,
     required this.timestamp,
+    this.distance,
   });
 
   Map<String, dynamic> toJson() => {
@@ -78,6 +80,7 @@ class WorkoutEntry {
     'description': description,
     'xp': xp,
     'timestamp': timestamp.toIso8601String(),
+    'distance': distance,
   };
 
   factory WorkoutEntry.fromJson(Map<String, dynamic> json) => WorkoutEntry(
@@ -88,5 +91,6 @@ class WorkoutEntry {
     description: json['description'],
     xp: json['xp'],
     timestamp: DateTime.parse(json['timestamp']),
+    distance: (json['distance'] as num?)?.toDouble(),
   );
 }
