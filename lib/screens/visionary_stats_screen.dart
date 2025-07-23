@@ -211,6 +211,7 @@ class _VisionaryStatsScreenState extends State<VisionaryStatsScreen> {
                     minX: 0,
                     maxX: 6,
                     minY: 0,
+                    maxY: 700,
                     lineBarsData: [
                       LineChartBarData(
                         spots: xpSpots,
@@ -251,14 +252,16 @@ class _VisionaryStatsScreenState extends State<VisionaryStatsScreen> {
                       leftTitles: AxisTitles(
                         sideTitles: SideTitles(
                           showTitles: true,
-                          interval: 10,
-                          getTitlesWidget: (value, meta) => Text(
-                            value.toInt().toString(),
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 10,
-                            ),
-                          ),
+                          interval: 100,
+                          getTitlesWidget: (value, meta) {
+                            if (value % 100 == 0 && value <= 700) {
+                              return Text(
+                                value.toInt().toString(),
+                                style: const TextStyle(color: Colors.white, fontSize: 10),
+                              );
+                            }
+                            return const SizedBox.shrink();
+                          },
                         ),
                       ),
                       topTitles: AxisTitles(
