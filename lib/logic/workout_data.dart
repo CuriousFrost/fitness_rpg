@@ -3,7 +3,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fitness_rpg/models/workout_entry.dart';
 import '../models/character_class.dart';
 
-
 // Updated workout_data.dart
 const int maxXpTotal = 152960;
 

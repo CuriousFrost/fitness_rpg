@@ -12,12 +12,13 @@ Widget build(BuildContext context) {
 }
 
 Future<void> showEditWorkoutDialog(
-  BuildContext context,
-  WorkoutEntry entry,
-  VoidCallback onSave,
-) async {
+    BuildContext context,
+    WorkoutEntry entry,
+    VoidCallback onSave,
+    ) async {
   final descController = TextEditingController(text: entry.description);
   final xpController = TextEditingController(text: entry.xp.toString());
+  final distanceController = TextEditingController(text: entry.distance.toString());
 
   await showDialog(
     context: context,
@@ -47,11 +48,15 @@ Future<void> showEditWorkoutDialog(
           onPressed: () {
             final newDesc = descController.text.trim();
             final newXp = int.tryParse(xpController.text) ?? entry.xp;
+            final newDistance = double.tryParse(distanceController.text);
 
             entry.description = newDesc.isNotEmpty
                 ? newDesc
                 : entry.description;
             entry.xp = newXp;
+            if (newDistance != null) {
+              entry.distance = newDistance;
+            }
 
             workoutData.save();
             onSave();
@@ -65,9 +70,9 @@ Future<void> showEditWorkoutDialog(
 }
 
 class WorkoutInputDialog extends StatefulWidget {
-  final void Function(WorkoutType, String, int) onWorkoutLogged;
-
-  const WorkoutInputDialog({super.key, required this.onWorkoutLogged});
+  final void Function(WorkoutType, String, int, {double? distance}) onWorkoutLogged;
+  final WorkoutEntry? entry;
+  const WorkoutInputDialog({super.key, required this.onWorkoutLogged, this.entry});
 
   @override
   State<WorkoutInputDialog> createState() => _WorkoutInputDialogState();
@@ -77,6 +82,24 @@ class _WorkoutInputDialogState extends State<WorkoutInputDialog> {
   WorkoutType? selectedWorkout;
   final TextEditingController primaryInput = TextEditingController();
   final TextEditingController secondaryInput = TextEditingController();
+  final TextEditingController distanceController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    selectedWorkout = widget.entry?.type;
+    primaryInput.text = widget.entry?.xp.toString() ?? '';
+    secondaryInput.text = widget.entry?.characterClass.toString() ?? '';
+    distanceController.text = widget.entry?.distance?.toString() ?? '';
+  }
+
+  @override
+  void dispose() {
+    primaryInput.dispose();
+    secondaryInput.dispose();
+    distanceController.dispose();
+    super.dispose();
+  }
 
   List<Widget> inputFields() {
     if (selectedWorkout == null) return [];
@@ -89,7 +112,7 @@ class _WorkoutInputDialogState extends State<WorkoutInputDialog> {
           TextField(
             controller: primaryInput,
             decoration: const InputDecoration(labelText: 'Distance (km)'),
-            keyboardType: TextInputType.numberWithOptions(decimal: true),
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
           ),
         ];
       case WorkoutType.stairs:
@@ -129,7 +152,21 @@ class _WorkoutInputDialogState extends State<WorkoutInputDialog> {
       secondary,
     );
 
-    widget.onWorkoutLogged(selectedWorkout!, desc, xp);
+    double? distance;
+    if (selectedWorkout == WorkoutType.running ||
+        selectedWorkout == WorkoutType.walking ||
+        selectedWorkout == WorkoutType.biking ||
+        selectedWorkout == WorkoutType.stairs) {
+      distance = primary;
+    }
+
+    widget.onWorkoutLogged(
+      selectedWorkout!,
+      desc,
+      xp,
+      distance: distance,
+    );
+
     Navigator.of(context).pop();
   }
 

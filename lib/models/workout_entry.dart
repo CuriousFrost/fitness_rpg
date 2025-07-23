@@ -63,7 +63,7 @@ class WorkoutEntry {
   String description;
   int xp;
   final DateTime timestamp;
-  final double? distance;
+  double? distance;
 
   WorkoutEntry({
     required this.characterClass,

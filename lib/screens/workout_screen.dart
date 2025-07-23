@@ -67,29 +67,34 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
               onPressed: selectedClass == null
                   ? null
                   : () {
-                showDialog(
-                  context: context,
-                  builder: (context) => WorkoutInputDialog(
-                          onWorkoutLogged: (workoutType, description, xp) async {
+                      showDialog(
+                        context: context,
+                        builder: (context) => WorkoutInputDialog(
+                          onWorkoutLogged: (workoutType, description, xp, {double? distance}) async {
                             if (selectedClass == null) return;
-                                                       final entry = WorkoutEntry(
+                            final entry = WorkoutEntry(
                               characterClass: selectedClass!,
                               type: workoutType,
                               xp: xp,
                               description: description,
+                              distance: distance,
                               timestamp: DateTime.now(),
                             );
 
-                            final oldXp = workoutData.characterXp[selectedClass!] ?? 0;
+                            final oldXp =
+                                workoutData.characterXp[selectedClass!] ?? 0;
 
                             workoutData.entries.add(entry);
-                            workoutData.characterXp[selectedClass!] = oldXp + xp;
-                            await workoutData.save(); // Wait for save to complete
+                            workoutData.characterXp[selectedClass!] =
+                                oldXp + xp;
+                            await workoutData
+                                .save(); // Wait for save to complete
 
                             setState(() {}); // Trigger UI update first
                             // Delay popup until after UI rebuild + XP data update
                             WidgetsBinding.instance.addPostFrameCallback((_) {
-                              final updatedXp = workoutData.characterXp[selectedClass!] ?? 0;
+                              final updatedXp =
+                                  workoutData.characterXp[selectedClass!] ?? 0;
                               showXpGainPopupWithBar(
                                 context,
                                 selectedClass!,

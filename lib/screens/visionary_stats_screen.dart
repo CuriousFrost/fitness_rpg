@@ -1,3 +1,6 @@
+// Converted version of your existing VisionaryStatsScreen to a StatefulWidget
+// Includes your original logic with automatic refresh via setState if needed
+
 import 'package:flutter/material.dart';
 import '../models/character_class.dart';
 import '../models/workout_entry.dart';
@@ -27,39 +30,47 @@ extension WorkoutTypeIcon on WorkoutType {
   }
 }
 
-class VisionaryStatsScreen extends StatelessWidget {
+class VisionaryStatsScreen extends StatefulWidget {
   final CharacterClass characterClass;
 
   const VisionaryStatsScreen({super.key, required this.characterClass});
 
   @override
-  Widget build(BuildContext context) {
-    // Filter entries for the selected character
-    final entries = workoutData.entries
-        .where((e) => e.characterClass == characterClass)
+  State<VisionaryStatsScreen> createState() => _VisionaryStatsScreenState();
+}
+
+class _VisionaryStatsScreenState extends State<VisionaryStatsScreen> {
+  late List<WorkoutEntry> entries;
+  late Map<WorkoutType, int> xpByType;
+  late Map<WorkoutType, double> distanceByType;
+  late List<FlSpot> xpSpots;
+
+  @override
+  void initState() {
+    super.initState();
+    _calculateStats();
+
+  }
+
+  void _calculateStats() {
+    final now = DateTime.now();
+    final weekStart = now
+        .subtract(Duration(days: now.weekday - 1))
+        .copyWith(hour: 5);
+
+    entries = workoutData.entries
+        .where((e) => e.characterClass == widget.characterClass)
         .toList();
 
-    // XP by workout type
-    final Map<WorkoutType, int> xpByType = {};
-    for (var e in entries) {
-      xpByType[e.type] = (xpByType[e.type] ?? 0) + e.xp;
-    }
-
-    // Distance tracker
-    final Map<WorkoutType, double> distanceByType = {
+    xpByType = {};
+    distanceByType = {
       WorkoutType.running: 0,
       WorkoutType.walking: 0,
       WorkoutType.biking: 0,
       WorkoutType.stairs: 0,
     };
-    for (var e in entries) {
-      if (distanceByType.containsKey(e.type)) {
-        distanceByType[e.type] = (distanceByType[e.type] ?? 0) + (e.distance ?? 0);
-      }
-    }
 
-    // 7-day XP overview
-    final Map<String, int> xpPerDay = {
+    final xpPerDay = {
       'Mon': 0,
       'Tue': 0,
       'Wed': 0,
@@ -68,17 +79,41 @@ class VisionaryStatsScreen extends StatelessWidget {
       'Sat': 0,
       'Sun': 0,
     };
-    final now = DateTime.now();
-    final weekStart = now.subtract(Duration(days: now.weekday - 1)).copyWith(hour: 5);
+
     for (var e in entries) {
+      xpByType[e.type] = (xpByType[e.type] ?? 0) + e.xp;
+
+      if (distanceByType.containsKey(e.type)) {
+        distanceByType[e.type] =
+            (distanceByType[e.type] ?? 0) + (e.distance ?? 0);
+      }
+
       if (e.timestamp.isAfter(weekStart)) {
-        final weekday = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][e.timestamp.weekday - 1];
+        final weekday = [
+          'Mon',
+          'Tue',
+          'Wed',
+          'Thu',
+          'Fri',
+          'Sat',
+          'Sun',
+        ][e.timestamp.weekday - 1];
         xpPerDay[weekday] = (xpPerDay[weekday] ?? 0) + e.xp;
       }
     }
 
+    xpSpots = xpPerDay.entries
+        .toList()
+        .asMap()
+        .entries
+        .map((e) => FlSpot(e.key.toDouble(), e.value.value.toDouble()))
+        .toList();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('${characterClass.displayName} Stats')),
+      appBar: AppBar(title: Text('${widget.characterClass.displayName} Stats')),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -108,7 +143,10 @@ class VisionaryStatsScreen extends StatelessWidget {
                       const SizedBox(height: 6),
                       Text(
                         '${entry.value} XP',
-                        style: const TextStyle(color: Colors.white, fontSize: 12),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                        ),
                       ),
                     ],
                   ),
@@ -128,12 +166,9 @@ class VisionaryStatsScreen extends StatelessWidget {
               crossAxisSpacing: 8,
               mainAxisSpacing: 8,
               children: distanceByType.entries.map((entry) {
-                String label;
-                if (entry.key == WorkoutType.stairs) {
-                  label = '${entry.value.toInt()} steps';
-                } else {
-                  label = '${entry.value.toStringAsFixed(1)} km';
-                }
+                String label = entry.key == WorkoutType.stairs
+                    ? '${entry.value.toInt()} steps'
+                    : '${entry.value.toStringAsFixed(1)} km';
                 return Container(
                   decoration: BoxDecoration(
                     color: Colors.teal[700],
@@ -146,7 +181,10 @@ class VisionaryStatsScreen extends StatelessWidget {
                       const SizedBox(height: 6),
                       Text(
                         label,
-                        style: const TextStyle(color: Colors.white, fontSize: 12),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                        ),
                       ),
                     ],
                   ),
@@ -170,38 +208,65 @@ class VisionaryStatsScreen extends StatelessWidget {
                 padding: const EdgeInsets.all(8.0),
                 child: LineChart(
                   LineChartData(
+                    minX: 0,
+                    maxX: 6,
+                    minY: 0,
                     lineBarsData: [
                       LineChartBarData(
-                        spots: xpPerDay.entries
-                            .toList()
-                            .asMap()
-                            .entries
-                            .map((e) => FlSpot(
-                          e.key.toDouble(),
-                          e.value.value.toDouble(),
-                        ))
-                            .toList(),
+                        spots: xpSpots,
                         isCurved: true,
                         color: Colors.white,
                         barWidth: 3,
                         dotData: FlDotData(show: true),
-                      )
+                      ),
                     ],
                     titlesData: FlTitlesData(
                       bottomTitles: AxisTitles(
                         sideTitles: SideTitles(
                           showTitles: true,
+                          interval: 1,
                           getTitlesWidget: (value, meta) {
-                            const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-                            return Text(days[value.toInt()], style: const TextStyle(color: Colors.white, fontSize: 10));
+                            const days = [
+                              'Mon',
+                              'Tue',
+                              'Wed',
+                              'Thu',
+                              'Fri',
+                              'Sat',
+                              'Sun',
+                            ];
+                            if (value >= 0 && value < days.length) {
+                              return Text(
+                                days[value.toInt()],
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 10,
+                                ),
+                              );
+                            }
+                            return const Text('');
                           },
                         ),
                       ),
                       leftTitles: AxisTitles(
-                        sideTitles: SideTitles(showTitles: true),
+                        sideTitles: SideTitles(
+                          showTitles: true,
+                          interval: 10,
+                          getTitlesWidget: (value, meta) => Text(
+                            value.toInt().toString(),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 10,
+                            ),
+                          ),
+                        ),
                       ),
-                      topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                      rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                      topTitles: AxisTitles(
+                        sideTitles: SideTitles(showTitles: false),
+                      ),
+                      rightTitles: AxisTitles(
+                        sideTitles: SideTitles(showTitles: false),
+                      ),
                     ),
                     gridData: FlGridData(show: true),
                     borderData: FlBorderData(show: false),

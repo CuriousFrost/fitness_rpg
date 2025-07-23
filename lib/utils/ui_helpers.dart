@@ -3,7 +3,12 @@ import '../widgets/xp_progress_bar.dart';
 import 'dart:ui';
 import '../models/character_class.dart';
 
-void showXpGainPopupWithBar(BuildContext context, CharacterClass characterClass, int oldXp, int newXp) {
+void showXpGainPopupWithBar(
+  BuildContext context,
+  CharacterClass characterClass,
+  int oldXp,
+  int newXp,
+) {
   final overlay = Overlay.of(context);
   late OverlayEntry overlayEntry;
 
@@ -36,7 +41,8 @@ class _XpPopupOverlay extends StatefulWidget {
   State<_XpPopupOverlay> createState() => _XpPopupOverlayState();
 }
 
-class _XpPopupOverlayState extends State<_XpPopupOverlay> with TickerProviderStateMixin {
+class _XpPopupOverlayState extends State<_XpPopupOverlay>
+    with TickerProviderStateMixin {
   late AnimationController _xpTextController;
   late AnimationController _xpBarController;
   bool showBar = false;
@@ -44,22 +50,20 @@ class _XpPopupOverlayState extends State<_XpPopupOverlay> with TickerProviderSta
   @override
   void initState() {
     super.initState();
-    _xpTextController = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 2),
-    )..forward().whenComplete(() {
-      setState(() => showBar = true);
-      _xpBarController.forward();
-    });
+    _xpTextController =
+        AnimationController(vsync: this, duration: const Duration(seconds: 2))
+          ..forward().whenComplete(() {
+            setState(() => showBar = true);
+            _xpBarController.forward();
+          });
 
-    _xpBarController = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 2),
-    )..addStatusListener((status) {
-      if (status == AnimationStatus.completed) {
-        Future.delayed(const Duration(seconds: 1), widget.onComplete);
-      }
-    });
+    _xpBarController =
+        AnimationController(vsync: this, duration: const Duration(seconds: 2))
+          ..addStatusListener((status) {
+            if (status == AnimationStatus.completed) {
+              Future.delayed(const Duration(seconds: 1), widget.onComplete);
+            }
+          });
   }
 
   @override
@@ -81,42 +85,49 @@ class _XpPopupOverlayState extends State<_XpPopupOverlay> with TickerProviderSta
           duration: const Duration(milliseconds: 300),
           child: showBar
               ? AnimatedBuilder(
-            animation: _xpBarController,
-            builder: (context, child) {
-              final animatedXp = lerpDouble(widget.oldXp, widget.newXp, _xpBarController.value)!.toInt();
-              return Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.black87,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: XPProgressBar(xp: animatedXp),
-              );
-            },
-          )
+                  animation: _xpBarController,
+                  builder: (context, child) {
+                    final animatedXp = lerpDouble(
+                      widget.oldXp,
+                      widget.newXp,
+                      _xpBarController.value,
+                    )!.toInt();
+                    return Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.black87,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: XPProgressBar(xp: animatedXp),
+                    );
+                  },
+                )
               : FadeTransition(
-            opacity: _xpTextController,
-            child: Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.green[700],
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  const BoxShadow(
-                    color: Colors.black26,
-                    blurRadius: 6,
-                    offset: Offset(0, 2),
-                  )
-                ],
-              ),
-              child: Center(
-                child: Text(
-                  'You gained ${widget.newXp - widget.oldXp} XP!',
-                  style: const TextStyle(color: Colors.white, fontSize: 16),
+                  opacity: _xpTextController,
+                  child: Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.green[700],
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        const BoxShadow(
+                          color: Colors.black26,
+                          blurRadius: 6,
+                          offset: Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Center(
+                      child: Text(
+                        'You gained ${widget.newXp - widget.oldXp} XP!',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
-              ),
-            ),
-          ),
         ),
       ),
     );

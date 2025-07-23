@@ -26,9 +26,7 @@ class FitnessRPGApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      routes: {
-        '/visionary': (context) => const CharacterScreen(),
-      },
+      routes: {'/visionary': (context) => const CharacterScreen()},
       title: 'Fitness RPG',
       theme: ThemeData.dark(),
       // 🔹 Wrap your root screen with PageStorage
