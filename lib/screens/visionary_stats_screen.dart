@@ -44,10 +44,28 @@ class _VisionaryStatsScreenState extends State<VisionaryStatsScreen> {
   late Map<WorkoutType, int> xpByType;
   late Map<WorkoutType, double> distanceByType;
   late List<FlSpot> xpSpots;
+  late String dateRange;
 
   @override
   void initState() {
     super.initState();
+    _calculateStats();
+    final now = DateTime.now();
+    final weekStart = now.subtract(Duration(days: now.weekday - 1)).copyWith(hour: 5);
+    final weekEnd = weekStart.add(const Duration(days: 6));
+
+    String formatDate(DateTime date) {
+      const months = [
+        'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+      ];
+      return '${months[date.month - 1]} ${date.day}';
+    }
+
+    dateRange = weekStart.month == weekEnd.month
+        ? '${formatDate(weekStart)} - ${weekEnd.day}'
+        : '${formatDate(weekStart)} - ${formatDate(weekEnd)}';
+
     _calculateStats();
 
   }
@@ -192,9 +210,9 @@ class _VisionaryStatsScreenState extends State<VisionaryStatsScreen> {
               }).toList(),
             ),
             const SizedBox(height: 24),
-            const Text(
-              '7-Day Overview',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            Text(
+              '7-Day XP Overview ($dateRange)',
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 12),
             Container(
