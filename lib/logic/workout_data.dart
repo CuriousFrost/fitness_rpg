@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fitness_rpg/models/workout_entry.dart';
 import '../models/character_class.dart';
 
+
 // Updated workout_data.dart
 const int maxXpTotal = 152960;
 
@@ -11,6 +12,8 @@ class WorkoutData {
   final Map<CharacterClass, int> _characterXp = {
     for (var c in CharacterClass.values) c: 0,
   };
+
+
 
   List<WorkoutEntry> get entries => _entries;
 
@@ -94,3 +97,4 @@ class WorkoutData {
     }
   }
 }
+final WorkoutData workoutData = WorkoutData();

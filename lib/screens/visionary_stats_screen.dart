@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import '../models/character_class.dart';
 import '../models/workout_entry.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:fitness_rpg/main.dart';
+import '../logic/workout_data.dart';
 
 extension WorkoutTypeIcon on WorkoutType {
   IconData get icon {

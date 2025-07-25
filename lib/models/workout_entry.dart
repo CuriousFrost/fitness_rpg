@@ -1,5 +1,6 @@
 import '../models/character_class.dart';
 
+
 enum WorkoutType {
   running,
   walking,

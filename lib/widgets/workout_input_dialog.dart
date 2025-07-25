@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:fitness_rpg/models/workout_entry.dart';
 import '../logic/math_helper.dart';
-import '../main.dart';
+import '../logic/workout_data.dart';
 
 // ========== Main Menu Navigation ==========
 @override

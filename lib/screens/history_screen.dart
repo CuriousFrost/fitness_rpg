@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import '../models/workout_entry.dart';
 import '../models/character_class.dart';
-import '../main.dart';
+import '../logic/workout_data.dart';
 
 class HistoryScreen extends StatefulWidget {
   const HistoryScreen({super.key});

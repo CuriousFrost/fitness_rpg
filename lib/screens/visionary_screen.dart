@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import '../models/character_class.dart';
 import 'workout_screen.dart';
 import '../widgets/xp_progress_bar.dart';
-import '../main.dart';
 import '../screens/visionary_stats_screen.dart';
+import '../logic/workout_data.dart';
 
 class CharacterScreen extends StatefulWidget {
   const CharacterScreen({super.key});

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../models/character_class.dart';
 import '../models/workout_entry.dart';
 import '../widgets/workout_input_dialog.dart';
-import '../main.dart';
+import '../logic/workout_data.dart';
 
 class WorkoutScreen extends StatefulWidget {
   const WorkoutScreen({super.key});
