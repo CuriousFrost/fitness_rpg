@@ -14,78 +14,51 @@ class MainMenuScreen extends StatelessWidget {
         children: [
           // Background image
           Image.asset(
-            'assets/images/main_menu_background_option_3.png',
+            'assets/images/Visionaries of Sol.png',
             fit: BoxFit.cover,
           ),
+
           // Menu buttons aligned in the target area
-          SafeArea(
-            child: Align(
-              alignment: const Alignment(0.9, -0.25),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  const SizedBox(height: 100), // Adjust for top spacing
-                  Text(
-                    'Visionaries of Sol',
-                    style: const TextStyle(
-                      fontSize: 60,
-                      fontFamily: 'Kadera',
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    textAlign: TextAlign.center,
+          Column(
+
+            mainAxisAlignment: MainAxisAlignment.center,
+
+            children: [
+              _buildMenuButton('Log Quest', () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const WorkoutScreen(),
                   ),
-                  const SizedBox(
-                    height: 40,
-                  ), // Spacing between title and buttons
-                  Expanded(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        _buildMenuButton('Log Quest', () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const WorkoutScreen(),
-                            ),
-                          );
-                        }),
-                        _buildMenuButton('Visionaries', () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const CharacterScreen(),
-                            ),
-                          );
-                        }),
-                        _buildMenuButton('Quest History', () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const HistoryScreen(),
-                            ),
-                          );
-                        }),
-                        _buildMenuButton('Storybook', () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Story mode coming soon!'),
-                            ),
-                          );
-                        }),
-                        _buildMenuButton('Team Builder', () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Team Builder coming soon!'),
-                            ),
-                          );
-                        }),
-                      ],
-                    ),
+                );
+              }),
+              _buildMenuButton('Visionaries', () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const CharacterScreen(),
                   ),
-                ],
-              ),
-            ),
+                );
+              }),
+              _buildMenuButton('Quest History', () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const HistoryScreen(),
+                  ),
+                );
+              }),
+              _buildMenuButton('Storybook', () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Story mode coming soon!')),
+                );
+              }),
+              _buildMenuButton('Team Builder', () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Team Builder coming soon!')),
+                );
+              }),
+            ],
           ),
         ],
       ),
@@ -99,7 +72,7 @@ class MainMenuScreen extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(12),
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
           child: Text(
             label,
             style: const TextStyle(

@@ -70,10 +70,19 @@ flutter:
     - assets/images/main_menu_graphic_and_title.png
     - assets/images/main_menu_background_option_2.png
     - assets/images/main_menu_background_option_3.png
+    - assets/images/main_menu_background_option_4.png
+    - assets/images/Visionaries of Sol.png
   fonts:
     - family: Kadera
       fonts:
        - asset: assets/fonts/Kadera-Demo.ttf
+    - family: Starlight
+      fonts:
+      - asset: assets/fonts/StarlightRune-Personal Use.ttf
+    - family: Cinzel
+      fonts:
+        - asset: assets/fonts/Cinzel-VariableFont_wght.ttf
+
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
