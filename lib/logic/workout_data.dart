@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fitness_rpg/models/workout_entry.dart';
-import '../models/character_class.dart';
+import '../models/visionary_class.dart';
 
 
 // Updated workout_data.dart
@@ -9,15 +9,15 @@ const int maxXpTotal = 152960;
 
 class WorkoutData {
   final List<WorkoutEntry> _entries = [];
-  final Map<CharacterClass, int> _characterXp = {
-    for (var c in CharacterClass.values) c: 0,
+  final Map<VisionaryClass, int> _characterXp = {
+    for (var c in VisionaryClass.values) c: 0,
   };
 
 
 
   List<WorkoutEntry> get entries => _entries;
 
-  Map<CharacterClass, int> get characterXp => _characterXp;
+  Map<VisionaryClass, int> get characterXp => _characterXp;
 
   void addWorkout(WorkoutEntry entry) {
     _entries.add(entry);
@@ -74,7 +74,7 @@ class WorkoutData {
 
     // Load XP or reset conditionally
     _characterXp.clear();
-    for (var c in CharacterClass.values) {
+    for (var c in VisionaryClass.values) {
       _characterXp[c] = 0;
     }
 
@@ -84,9 +84,9 @@ class WorkoutData {
         final Map<String, dynamic> decoded = jsonDecode(xpString);
         for (var entry in decoded.entries) {
           try {
-            final classEnum = CharacterClass.values.firstWhere(
+            final classEnum = VisionaryClass.values.firstWhere(
               (e) => e.name == entry.key,
-              orElse: () => CharacterClass.bloodletter,
+              orElse: () => VisionaryClass.bloodletter,
             );
             _characterXp[classEnum] = entry.value;
           } catch (_) {

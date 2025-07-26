@@ -1,12 +1,12 @@
-// models/character_data.dart
+// models/visionary_data.dart
 import 'dart:convert';
 import 'dart:math';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../models/character_class.dart';
+import '../models/visionary_class.dart';
 import '../models/combat_stats.dart';
 
 
-class CharacterData {
+class VisionaryData {
   final String id;
   final String displayName;
   final String description;
@@ -14,7 +14,7 @@ class CharacterData {
   final String weaponType;
   final CombatStats combatStats;
 
-  CharacterData({
+  VisionaryData({
     required this.id,
     required this.displayName,
     required this.description,
@@ -23,12 +23,12 @@ class CharacterData {
     required this.combatStats,
   });
 
-  static final Map<CharacterClass, int> classXp = {
-    for (var c in CharacterClass.values) c: 0,
+  static final Map<VisionaryClass, int> classXp = {
+    for (var c in VisionaryClass.values) c: 0,
   };
 
-  static final Map<CharacterClass, int> classLevel = {
-    for (var c in CharacterClass.values) c: 1,
+  static final Map<VisionaryClass, int> classLevel = {
+    for (var c in VisionaryClass.values) c: 1,
   };
 
   static int xpToNextLevel(int level) {
@@ -55,7 +55,7 @@ class CharacterData {
       final Map<String, dynamic> xpMap = jsonDecode(xpJson);
       final Map<String, dynamic> levelMap = jsonDecode(levelJson);
 
-      for (var c in CharacterClass.values) {
+      for (var c in VisionaryClass.values) {
         classXp[c] = xpMap[c.name] ?? 0;
         classLevel[c] = levelMap[c.name] ?? 1;
       }

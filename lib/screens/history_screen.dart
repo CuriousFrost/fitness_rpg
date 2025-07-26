@@ -1,7 +1,7 @@
 // screens/history_screen.dart
 import 'package:flutter/material.dart';
 import '../models/workout_entry.dart';
-import '../models/character_class.dart';
+import '../models/visionary_class.dart';
 import '../logic/workout_data.dart';
 
 class HistoryScreen extends StatefulWidget {
@@ -12,7 +12,7 @@ class HistoryScreen extends StatefulWidget {
 }
 
 class _HistoryScreenState extends State<HistoryScreen> {
-  CharacterClass? _selectedClassFilter;
+  VisionaryClass? _selectedClassFilter;
   String selectedFilter = 'Newest';
 
   final List<String> filterOptions = [
@@ -178,14 +178,14 @@ class _HistoryScreenState extends State<HistoryScreen> {
             Row(
               children: [
                 Expanded(
-                  child: DropdownButton<CharacterClass>(
+                  child: DropdownButton<VisionaryClass>(
                     value: _selectedClassFilter,
                     isExpanded: true,
                     hint: const Text('Filter by Visionary'),
                     onChanged: (newClass) {
                       setState(() => _selectedClassFilter = newClass);
                     },
-                    items: CharacterClass.values.map((c) {
+                    items: VisionaryClass.values.map((c) {
                       return DropdownMenuItem(
                         value: c,
                         child: Text(c.displayName),

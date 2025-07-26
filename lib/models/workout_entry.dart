@@ -1,4 +1,4 @@
-import '../models/character_class.dart';
+import '../models/visionary_class.dart';
 
 
 enum WorkoutType {
@@ -59,7 +59,7 @@ extension WorkoutTypeName on WorkoutType {
 }
 
 class WorkoutEntry {
-  final CharacterClass characterClass;
+  final VisionaryClass characterClass;
   final WorkoutType type;
   String description;
   int xp;
@@ -85,7 +85,7 @@ class WorkoutEntry {
   };
 
   factory WorkoutEntry.fromJson(Map<String, dynamic> json) => WorkoutEntry(
-    characterClass: CharacterClass.values.firstWhere(
+    characterClass: VisionaryClass.values.firstWhere(
       (e) => e.name == json['characterClass'],
     ),
     type: WorkoutType.values.firstWhere((e) => e.name == json['type']),

@@ -1,4 +1,4 @@
-enum CharacterClass {
+enum VisionaryClass {
   bloodletter,
   airsnatcher,
   saboteur,
@@ -11,28 +11,28 @@ enum CharacterClass {
   realist,
 }
 
-extension CharacterClassName on CharacterClass {
+extension CharacterClassName on VisionaryClass {
   String get displayName {
     switch (this) {
-      case CharacterClass.bloodletter:
+      case VisionaryClass.bloodletter:
         return 'Bloodletter';
-      case CharacterClass.airsnatcher:
+      case VisionaryClass.airsnatcher:
         return 'Airsnatcher';
-      case CharacterClass.saboteur:
+      case VisionaryClass.saboteur:
         return 'Saboteur';
-      case CharacterClass.lightTheologist:
+      case VisionaryClass.lightTheologist:
         return 'Light Theologist';
-      case CharacterClass.victimizer:
+      case VisionaryClass.victimizer:
         return 'Victimizer';
-      case CharacterClass.symbolist:
+      case VisionaryClass.symbolist:
         return 'Symbolist';
-      case CharacterClass.cosmologist:
+      case VisionaryClass.cosmologist:
         return 'Cosmologist';
-      case CharacterClass.mossborn:
+      case VisionaryClass.mossborn:
         return 'Mossborn';
-      case CharacterClass.farseer:
+      case VisionaryClass.farseer:
         return 'Farseer';
-      case CharacterClass.realist:
+      case VisionaryClass.realist:
         return 'Realist';
     }
   }

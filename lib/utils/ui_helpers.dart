@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import '../widgets/xp_progress_bar.dart';
 import 'dart:ui';
-import '../models/character_class.dart';
+import '../models/visionary_class.dart';
 
 void showXpGainPopupWithBar(
   BuildContext context,
-  CharacterClass characterClass,
+  VisionaryClass characterClass,
   int oldXp,
   int newXp,
 ) {
@@ -25,7 +25,7 @@ void showXpGainPopupWithBar(
 }
 
 class _XpPopupOverlay extends StatefulWidget {
-  final CharacterClass characterClass;
+  final VisionaryClass characterClass;
   final int oldXp;
   final int newXp;
   final VoidCallback onComplete;

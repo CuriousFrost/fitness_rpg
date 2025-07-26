@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
-import '../models/character_data.dart';
+import '../models/visionary_data.dart';
 import 'visionary_stats_screen.dart';
 
 
 class VisionaryCombatStatsScreen extends StatelessWidget {
-  final CharacterData characterClass;
+  final VisionaryData characterClass;
 
-  const VisionaryCombatStatsScreen({super.key, required this.characterClass});
+  const VisionaryCombatStatsScreen({super.key, required this.characterClass, required this.stats});
+
 
   @override
   Widget build(BuildContext context) {

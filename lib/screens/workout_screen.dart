@@ -1,6 +1,6 @@
 import 'package:fitness_rpg/utils/ui_helpers.dart';
 import 'package:flutter/material.dart';
-import '../models/character_class.dart';
+import '../models/visionary_class.dart';
 import '../models/workout_entry.dart';
 import '../widgets/workout_input_dialog.dart';
 import '../logic/workout_data.dart';
@@ -13,7 +13,7 @@ class WorkoutScreen extends StatefulWidget {
 }
 
 class _WorkoutScreenState extends State<WorkoutScreen> {
-  CharacterClass? selectedClass;
+  VisionaryClass? selectedClass;
 
   @override
   void initState() {
@@ -22,14 +22,14 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
         PageStorage.of(context).readState(context, identifier: 'selectedClass')
             as String?;
     if (stored != null) {
-      selectedClass = CharacterClass.values.firstWhere(
+      selectedClass = VisionaryClass.values.firstWhere(
         (c) => c.name == stored,
-        orElse: () => CharacterClass.values.first,
+        orElse: () => VisionaryClass.values.first,
       );
     }
   }
 
-  void _onClassChanged(CharacterClass? newValue) {
+  void _onClassChanged(VisionaryClass? newValue) {
     setState(() {
       selectedClass = newValue;
       PageStorage.of(
@@ -40,7 +40,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final List<CharacterClass> classNames = CharacterClass.values;
+    final List<VisionaryClass> classNames = VisionaryClass.values;
 
     return Scaffold(
       appBar: AppBar(title: const Text('Workout')),
@@ -49,14 +49,14 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            DropdownButton<CharacterClass>(
+            DropdownButton<VisionaryClass>(
               key: const PageStorageKey<String>('classDropdown'),
               value: selectedClass,
               hint: const Text('Select a Visionary'),
               isExpanded: true,
               onChanged: _onClassChanged,
               items: classNames.map((c) {
-                return DropdownMenuItem<CharacterClass>(
+                return DropdownMenuItem<VisionaryClass>(
                   value: c,
                   child: Text(c.displayName),
                 );

@@ -1,76 +1,67 @@
 import 'package:flutter/material.dart';
-import '../models/character_class.dart';
+import '../models/visionary_class.dart';
 import 'workout_screen.dart';
 import '../widgets/xp_progress_bar.dart';
 import '../screens/visionary_stats_screen.dart';
 import '../logic/workout_data.dart';
+import '../models/visionary_data.dart';
 
 
-class CharacterScreen extends StatefulWidget {
+class CharacterScreen extends StatelessWidget {
   const CharacterScreen({super.key});
 
   @override
-  State<CharacterScreen> createState() => _CharacterScreenState();
-}
-
-class _CharacterScreenState extends State<CharacterScreen> {
-  @override
   Widget build(BuildContext context) {
+    final characters = VisionaryData.characters;
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Visionary Progress')),
+      appBar: AppBar(
+        title: const Text('Visionaries'),
+      ),
       body: ListView.builder(
-        itemCount: CharacterClass.values.length,
+        itemCount: characters.length,
         itemBuilder: (context, index) {
-          final characterClass = CharacterClass.values[index];
-          final xp = workoutData.characterXp[characterClass] ?? 0;
-          return InkWell(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) =>
-                      VisionaryStatsScreen(characterClass: characterClass),
-                ),
-              );
-            },
-            child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 16.0,
-                vertical: 8.0,
+          final character = characters[index];
+          final stats = combatStatsMap[character.characterClass];
+
+          return Card(
+            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            elevation: 4,
+            child: ListTile(
+              leading: CircleAvatar(
+                backgroundColor: Colors.blueGrey[100],
+                child: Text(character.name[0]),
               ),
-              child: Column(
+              title: Text(character.name),
+              subtitle: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    characterClass.displayName,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  Text('Class: ${character.characterClass.displayName}'),
+                  Text('Level: ${character.level}'),
+                  LinearProgressIndicator(
+                    value: character.xp / character.xpToNextLevel,
+                    backgroundColor: Colors.grey[300],
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
                   ),
-                  const SizedBox(height: 4),
-                  XPProgressBar(xp: xp),
-                  const SizedBox(height: 6),
-                  Text(
-                    'Total: $xp XP',
-                    style: const TextStyle(fontSize: 12, color: Colors.grey),
-                  ),
-                  const Divider(thickness: 1, height: 20),
+                  Text('${character.xp} / ${character.xpToNextLevel} XP'),
                 ],
               ),
+              onTap: () {
+                if (stats != null) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => VisionaryCombatStatsScreen(
+                        characterClass: character.characterClass,
+                        stats: stats,
+                      ),
+                    ),
+                  );
+                }
+              },
             ),
           );
         },
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          await Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const WorkoutScreen()),
-          );
-          setState(() {}); // Refresh after returning from workout screen
-        },
-        child: const Icon(Icons.fitness_center),
       ),
     );
   }
