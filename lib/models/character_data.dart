@@ -3,8 +3,26 @@ import 'dart:convert';
 import 'dart:math';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/character_class.dart';
+import '../models/combat_stats.dart';
+
 
 class CharacterData {
+  final String id;
+  final String displayName;
+  final String description;
+  final String classType;
+  final String weaponType;
+  final CombatStats combatStats;
+
+  CharacterData({
+    required this.id,
+    required this.displayName,
+    required this.description,
+    required this.classType,
+    required this.weaponType,
+    required this.combatStats,
+  });
+
   static final Map<CharacterClass, int> classXp = {
     for (var c in CharacterClass.values) c: 0,
   };
@@ -43,4 +61,5 @@ class CharacterData {
       }
     }
   }
+
 }

@@ -1,6 +1,7 @@
 // Converted version of your existing VisionaryStatsScreen to a StatefulWidget
 // Includes your original logic with automatic refresh via setState if needed
 
+import 'package:fitness_rpg/models/character_data.dart';
 import 'package:flutter/material.dart';
 import '../models/character_class.dart';
 import '../models/workout_entry.dart';
@@ -31,7 +32,7 @@ extension WorkoutTypeIcon on WorkoutType {
 }
 
 class VisionaryStatsScreen extends StatefulWidget {
-  final CharacterClass characterClass;
+  final CharacterData characterClass;
 
   const VisionaryStatsScreen({super.key, required this.characterClass});
 

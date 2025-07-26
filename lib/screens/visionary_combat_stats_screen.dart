@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import '../models/character_data.dart';
 import 'visionary_stats_screen.dart';
-import '../screens/visionary_screen.dart';
+
 
 class VisionaryCombatStatsScreen extends StatelessWidget {
-  final CharacterClass characterClass;
+  final CharacterData characterClass;
 
   const VisionaryCombatStatsScreen({super.key, required this.characterClass});
 
@@ -46,14 +46,14 @@ class VisionaryCombatStatsScreen extends StatelessWidget {
               children: [
                 _buildStatTile('HP', combatStats.hp.toString()),
                 _buildStatTile('ATK', combatStats.atk.toString()),
-                _buildStatTile('DEF', combatStats.def.toString()),
+                _buildStatTile('DEF', combatStats.defense.toString()),
                 _buildStatTile('SPD', combatStats.spd.toString()),
               ],
             ),
             const SizedBox(height: 24),
             Row(
               children: [
-                _buildAttributeTag('Class: ${characterClass.type}'),
+                _buildAttributeTag('Class: ${characterClass.classType}'),
                 const SizedBox(width: 12),
                 _buildAttributeTag('Weapon: ${characterClass.weaponType}'),
               ],

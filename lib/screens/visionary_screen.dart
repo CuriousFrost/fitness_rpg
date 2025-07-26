@@ -5,6 +5,7 @@ import '../widgets/xp_progress_bar.dart';
 import '../screens/visionary_stats_screen.dart';
 import '../logic/workout_data.dart';
 
+
 class CharacterScreen extends StatefulWidget {
   const CharacterScreen({super.key});
 
