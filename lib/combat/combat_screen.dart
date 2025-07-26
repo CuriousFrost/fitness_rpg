@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../models/character_data.dart';
 import 'combat_unit.dart';
 
-class CombatScreen extends StatefulWidget {
+/*class CombatScreen extends StatefulWidget {
   final List<CharacterClass> team;
 
   const CombatScreen({super.key, required this.team});
@@ -77,3 +77,4 @@ class _CombatScreenState extends State<CombatScreen> {
     );
   }
 }
+*/
