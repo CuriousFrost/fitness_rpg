@@ -3,7 +3,6 @@
 
 import 'package:fitness_rpg/models/visionary_data.dart';
 import 'package:flutter/material.dart';
-import '../models/visionary_class.dart';
 import '../models/workout_entry.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../logic/workout_data.dart';

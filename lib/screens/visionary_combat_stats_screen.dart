@@ -1,34 +1,46 @@
+// visionary_combat_stats_screen.dart
+
 import 'package:flutter/material.dart';
-import '../models/visionary_data.dart';
+import '../models/visionary_class.dart';
 import 'visionary_stats_screen.dart';
 import '../models/combat_stats.dart';
 
-
-
 class VisionaryCombatStatsScreen extends StatelessWidget {
-  final VisionaryData visionaryClass;
+  final VisionaryClass actualVisionaryClass;
   final CombatStats stats;
+  final String visionaryName;
+  final int level;
+  final int xp;
+  final int xpToNextLevel;
+  final double xpProgress;
+  final String description;
+  final String weaponType;
 
-  const VisionaryCombatStatsScreen({super.key, required this.visionaryClass, required this.stats});
-
+  const VisionaryCombatStatsScreen({
+    super.key,
+    required this.actualVisionaryClass,
+    required this.stats,
+    required this.visionaryName,
+    required this.level,
+    required this.xp,
+    required this.xpToNextLevel,
+    required this.xpProgress,
+    required this.description,
+    required this.weaponType,
+  });
 
   @override
-  Widget build(BuildContext context) {
-    final combatStats = visionaryClass.combatStats;
-
+  Widget build(BuildContext context) { // context is available here
     return Scaffold(
       appBar: AppBar(
-        title: Text(visionaryClass.displayName),
+        title: Text(visionaryName),
         actions: [
           IconButton(
             icon: const Icon(Icons.bar_chart),
             tooltip: 'Workout Stats',
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => VisionaryStatsScreen(visionary: visionaryClass),
-                ),
+              ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('VisionaryStatsScreen navigation needs review.'))
               );
             },
           ),
@@ -40,26 +52,28 @@ class VisionaryCombatStatsScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              visionaryClass.description,
+              description,
               style: const TextStyle(fontSize: 16),
             ),
             const SizedBox(height: 20),
+            Text('Level: $level, XP: $xp / $xpToNextLevel (${(xpProgress * 100).toStringAsFixed(1)}%)'),
+            const SizedBox(height: 10),
             Wrap(
               spacing: 16,
               runSpacing: 16,
               children: [
-                _buildStatTile('HP', combatStats.hp.toString()),
-                _buildStatTile('ATK', combatStats.atk.toString()),
-                _buildStatTile('DEF', combatStats.defense.toString()),
-                _buildStatTile('SPD', combatStats.spd.toString()),
+                _buildStatTile(context, 'HP', stats.hp.toString()),      // Pass context
+                _buildStatTile(context, 'ATK', stats.atk.toString()),    // Pass context
+                _buildStatTile(context, 'DEF', stats.def.toString()),    // Pass context
+                _buildStatTile(context, 'SPD', stats.spd.toString()),    // Pass context
               ],
             ),
             const SizedBox(height: 24),
             Row(
               children: [
-                _buildAttributeTag('Class: ${visionaryClass.classType}'),
+                _buildAttributeTag(context, 'Class: ${actualVisionaryClass.displayName}'), // Pass context
                 const SizedBox(width: 12),
-                _buildAttributeTag('Weapon: ${visionaryClass.weaponType}'),
+                _buildAttributeTag(context, 'Weapon: $weaponType'),                    // Pass context
               ],
             ),
           ],
@@ -68,34 +82,61 @@ class VisionaryCombatStatsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildStatTile(String label, String value) {
+  // Updated to accept BuildContext
+  Widget _buildStatTile(BuildContext context, String label, String value) {
     return Container(
       width: 80,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.indigo[100],
+        color: Theme.of(context).colorScheme.secondaryContainer,
         borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            spreadRadius: 1,
+            blurRadius: 3,
+            offset: Offset(0, 2),
+          ),
+        ],
       ),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
+          Text(
+            label,
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: Theme.of(context).colorScheme.onSecondaryContainer,
+            ),
+          ),
           const SizedBox(height: 6),
-          Text(value, style: const TextStyle(fontSize: 16)),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 16,
+              color: Theme.of(context).colorScheme.onSecondaryContainer,
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildAttributeTag(String text) {
+  // Updated to accept BuildContext
+  Widget _buildAttributeTag(BuildContext context, String text) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: Colors.green[100],
+        color: Theme.of(context).colorScheme.tertiaryContainer,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(
         text,
-        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+        style: TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+          color: Theme.of(context).colorScheme.onTertiaryContainer,
+        ),
       ),
     );
   }

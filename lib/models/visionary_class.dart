@@ -1,3 +1,4 @@
+// lib/models/visionary_class.dart
 enum VisionaryClass {
   bloodletter,
   airsnatcher,
@@ -8,9 +9,28 @@ enum VisionaryClass {
   cosmologist,
   mossborn,
   farseer,
-  realist,
-}
+  realist; // Semicolon is essential here to separate enum values from members.
 
+  // Ensure there are no stray characters or comments that look like code
+  // between the semicolon above and this static method.
+
+  static VisionaryClass fromString(String? className) { // Made className nullable for safety
+    if (className == null || className.trim().isEmpty) {
+      print(
+          "Warning: Received null or empty className. Defaulting to ${VisionaryClass.values.first.name}.");
+      return VisionaryClass.values.first;
+    }
+    try {
+      return VisionaryClass.values.firstWhere(
+            (e) => e.name.toLowerCase() == className.toLowerCase().trim(),
+      );
+    } catch (e) {
+      print(
+          "Warning: Could not find VisionaryClass for name: '$className'. Defaulting to ${VisionaryClass.values.first.name}.");
+      return VisionaryClass.values.first;
+    }
+  }
+}
 extension CharacterClassName on VisionaryClass {
   String get displayName {
     switch (this) {

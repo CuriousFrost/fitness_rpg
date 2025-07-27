@@ -72,6 +72,7 @@ flutter:
     - assets/images/main_menu_background_option_3.png
     - assets/images/main_menu_background_option_4.png
     - assets/images/Visionaries of Sol.png
+    - assets/text/visionary_descriptions.json
   fonts:
     - family: Kadera
       fonts:

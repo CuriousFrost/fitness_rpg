@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'screens/main_menu.dart';
+import '../models/visionary_data.dart';
 //import 'package:shared_preferences/shared_preferences.dart';
 
 // 🔹 Add this:
 final PageStorageBucket pageStorageBucket = PageStorageBucket();
 
-void main() {
+Future <void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await VisionaryData.initialize();
+  await VisionaryData.load();
   runApp(const FitnessRPGApp());
 }
 
@@ -22,5 +26,5 @@ class FitnessRPGApp extends StatelessWidget {
     );
   }
 }
-// lib/logic/workout_data.dart
+
 
