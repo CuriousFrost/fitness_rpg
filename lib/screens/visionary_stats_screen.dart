@@ -32,9 +32,9 @@ extension WorkoutTypeIcon on WorkoutType {
 }
 
 class VisionaryStatsScreen extends StatefulWidget {
-  final VisionaryData characterClass;
+  final VisionaryData visionary;
 
-  const VisionaryStatsScreen({super.key, required this.characterClass});
+  const VisionaryStatsScreen({super.key, required this.visionary});
 
   @override
   State<VisionaryStatsScreen> createState() => _VisionaryStatsScreenState();
@@ -78,7 +78,7 @@ class _VisionaryStatsScreenState extends State<VisionaryStatsScreen> {
         .copyWith(hour: 5);
 
     entries = workoutData.entries
-        .where((e) => e.characterClass == widget.characterClass)
+        .where((e) => e.visionary == widget.visionary)
         .toList();
 
     xpByType = {};
@@ -132,7 +132,7 @@ class _VisionaryStatsScreenState extends State<VisionaryStatsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('${widget.characterClass.displayName} Stats')),
+      appBar: AppBar(title: Text('${widget.visionary.displayName} Stats')),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(

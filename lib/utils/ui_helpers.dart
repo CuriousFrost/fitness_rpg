@@ -5,7 +5,7 @@ import '../models/visionary_class.dart';
 
 void showXpGainPopupWithBar(
   BuildContext context,
-  VisionaryClass characterClass,
+  VisionaryClass visionary,
   int oldXp,
   int newXp,
 ) {
@@ -14,7 +14,7 @@ void showXpGainPopupWithBar(
 
   overlayEntry = OverlayEntry(
     builder: (context) => _XpPopupOverlay(
-      characterClass: characterClass,
+      visionary: visionary,
       oldXp: oldXp,
       newXp: newXp,
       onComplete: () => overlayEntry.remove(),
@@ -25,13 +25,13 @@ void showXpGainPopupWithBar(
 }
 
 class _XpPopupOverlay extends StatefulWidget {
-  final VisionaryClass characterClass;
+  final VisionaryClass visionary;
   final int oldXp;
   final int newXp;
   final VoidCallback onComplete;
 
   const _XpPopupOverlay({
-    required this.characterClass,
+    required this.visionary,
     required this.oldXp,
     required this.newXp,
     required this.onComplete,

@@ -89,7 +89,7 @@ class _WorkoutInputDialogState extends State<WorkoutInputDialog> {
     super.initState();
     selectedWorkout = widget.entry?.type;
     primaryInput.text = widget.entry?.xp.toString() ?? '';
-    secondaryInput.text = widget.entry?.characterClass.toString() ?? '';
+    secondaryInput.text = widget.entry?.visionary.toString() ?? '';
     distanceController.text = widget.entry?.distance?.toString() ?? '';
   }
 

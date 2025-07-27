@@ -113,16 +113,16 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 }
 
                 final int oldXp = entry.xp;
-                workoutData.characterXp[entry.characterClass] =
-                    (workoutData.characterXp[entry.characterClass] ?? 0) -
+                workoutData.characterXp[entry.visionary] =
+                    (workoutData.characterXp[entry.visionary] ?? 0) -
                     oldXp +
                     newXp;
-                if (workoutData.characterXp[entry.characterClass]! < 0) {
-                  workoutData.characterXp[entry.characterClass] = 0;
+                if (workoutData.characterXp[entry.visionary]! < 0) {
+                  workoutData.characterXp[entry.visionary] = 0;
                 }
 
                 final updatedEntry = WorkoutEntry(
-                  characterClass: entry.characterClass,
+                  visionary: entry.visionary,
                   type: entry.type,
                   description: newDescription,
                   xp: newXp,
@@ -149,7 +149,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
     if (_selectedClassFilter != null) {
       filteredHistory = filteredHistory
-          .where((entry) => entry.characterClass == _selectedClassFilter)
+          .where((entry) => entry.visionary == _selectedClassFilter)
           .toList();
     }
 
@@ -276,7 +276,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                               if (confirmed) {
                                 setState(() {
                                   final xp = entry.xp;
-                                  final classKey = entry.characterClass;
+                                  final classKey = entry.visionary;
                                   workoutData.characterXp[classKey] =
                                       (workoutData.characterXp[classKey] ?? 0) -
                                       xp;

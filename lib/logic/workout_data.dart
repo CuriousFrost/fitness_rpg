@@ -21,11 +21,11 @@ class WorkoutData {
 
   void addWorkout(WorkoutEntry entry) {
     _entries.add(entry);
-    _characterXp[entry.characterClass] =
-        (_characterXp[entry.characterClass] ?? 0) + entry.xp;
+    _characterXp[entry.visionary] =
+        (_characterXp[entry.visionary] ?? 0) + entry.xp;
     save();
-    if (_characterXp[entry.characterClass]! > maxXpTotal) {
-      _characterXp[entry.characterClass] = maxXpTotal;
+    if (_characterXp[entry.visionary]! > maxXpTotal) {
+      _characterXp[entry.visionary] = maxXpTotal;
     }
   }
 
@@ -33,20 +33,20 @@ class WorkoutData {
     final index = _entries.indexOf(oldEntry);
     if (index != -1) {
       _entries[index] = newEntry;
-      _characterXp[oldEntry.characterClass] =
-          ((_characterXp[oldEntry.characterClass] ?? 0) - oldEntry.xp)
+      _characterXp[oldEntry.visionary] =
+          ((_characterXp[oldEntry.visionary] ?? 0) - oldEntry.xp)
               .clamp(0, double.infinity)
               .toInt();
-      _characterXp[newEntry.characterClass] =
-          (_characterXp[newEntry.characterClass] ?? 0) + newEntry.xp;
+      _characterXp[newEntry.visionary] =
+          (_characterXp[newEntry.visionary] ?? 0) + newEntry.xp;
       save();
     }
   }
 
   void deleteWorkout(WorkoutEntry entry) {
     _entries.remove(entry);
-    _characterXp[entry.characterClass] =
-        ((_characterXp[entry.characterClass] ?? 0) - entry.xp)
+    _characterXp[entry.visionary] =
+        ((_characterXp[entry.visionary] ?? 0) - entry.xp)
             .clamp(0, double.infinity)
             .toInt();
     save();

@@ -73,7 +73,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                           onWorkoutLogged: (workoutType, description, xp, {double? distance}) async {
                             if (selectedClass == null) return;
                             final entry = WorkoutEntry(
-                              characterClass: selectedClass!,
+                              visionary: selectedClass!,
                               type: workoutType,
                               xp: xp,
                               description: description,

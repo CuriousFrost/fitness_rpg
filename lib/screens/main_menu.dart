@@ -36,7 +36,7 @@ class MainMenuScreen extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const CharacterScreen(),
+                    builder: (context) => const VisionaryScreen(),
                   ),
                 );
               }),

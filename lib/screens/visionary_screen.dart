@@ -5,24 +5,26 @@ import '../widgets/xp_progress_bar.dart';
 import '../screens/visionary_stats_screen.dart';
 import '../logic/workout_data.dart';
 import '../models/visionary_data.dart';
+import '../screens/visionary_combat_stats_screen.dart';
+import '../models/combat_stats.dart';
 
 
-class CharacterScreen extends StatelessWidget {
-  const CharacterScreen({super.key});
+class VisionaryScreen extends StatelessWidget {
+  const VisionaryScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final characters = VisionaryData.characters;
+    final visionaries = VisionaryData.visionaries;
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Visionaries'),
       ),
       body: ListView.builder(
-        itemCount: characters.length,
+        itemCount: visionaries.length,
         itemBuilder: (context, index) {
-          final character = characters[index];
-          final stats = combatStatsMap[character.characterClass];
+          final visionary = visionaries[index];
+          final stats = combatStatsMap[visionary.visionaryClass];
 
           return Card(
             margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -30,20 +32,20 @@ class CharacterScreen extends StatelessWidget {
             child: ListTile(
               leading: CircleAvatar(
                 backgroundColor: Colors.blueGrey[100],
-                child: Text(character.name[0]),
+                child: Text(visionary.name[0]),
               ),
-              title: Text(character.name),
+              title: Text(visionary.name),
               subtitle: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Class: ${character.characterClass.displayName}'),
-                  Text('Level: ${character.level}'),
+                  Text('Class: ${visionary.visionaryClass.displayName}'),
+                  Text('Level: ${visionary.level}'),
                   LinearProgressIndicator(
-                    value: character.xp / character.xpToNextLevel,
+                    value: visionary.xp / visionary.xpToNextLevel,
                     backgroundColor: Colors.grey[300],
                     valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
                   ),
-                  Text('${character.xp} / ${character.xpToNextLevel} XP'),
+                  Text('${visionary.xp} / ${visionary.xpToNextLevel} XP'),
                 ],
               ),
               onTap: () {
@@ -52,7 +54,7 @@ class CharacterScreen extends StatelessWidget {
                     context,
                     MaterialPageRoute(
                       builder: (context) => VisionaryCombatStatsScreen(
-                        characterClass: character.characterClass,
+                        visionaryClass: visionary.visionaryClass,
                         stats: stats,
                       ),
                     ),

@@ -59,7 +59,7 @@ extension WorkoutTypeName on WorkoutType {
 }
 
 class WorkoutEntry {
-  final VisionaryClass characterClass;
+  final VisionaryClass visionary;
   final WorkoutType type;
   String description;
   int xp;
@@ -67,7 +67,7 @@ class WorkoutEntry {
   double? distance;
 
   WorkoutEntry({
-    required this.characterClass,
+    required this.visionary,
     required this.type,
     required this.description,
     required this.xp,
@@ -76,7 +76,7 @@ class WorkoutEntry {
   });
 
   Map<String, dynamic> toJson() => {
-    'characterClass': characterClass.name,
+    'characterClass': visionary.name,
     'type': type.name,
     'description': description,
     'xp': xp,
@@ -85,7 +85,7 @@ class WorkoutEntry {
   };
 
   factory WorkoutEntry.fromJson(Map<String, dynamic> json) => WorkoutEntry(
-    characterClass: VisionaryClass.values.firstWhere(
+    visionary: VisionaryClass.values.firstWhere(
       (e) => e.name == json['characterClass'],
     ),
     type: WorkoutType.values.firstWhere((e) => e.name == json['type']),

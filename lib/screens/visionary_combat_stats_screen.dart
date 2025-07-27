@@ -1,21 +1,24 @@
 import 'package:flutter/material.dart';
 import '../models/visionary_data.dart';
 import 'visionary_stats_screen.dart';
+import '../models/combat_stats.dart';
+
 
 
 class VisionaryCombatStatsScreen extends StatelessWidget {
-  final VisionaryData characterClass;
+  final VisionaryData visionaryClass;
+  final CombatStats stats;
 
-  const VisionaryCombatStatsScreen({super.key, required this.characterClass, required this.stats});
+  const VisionaryCombatStatsScreen({super.key, required this.visionaryClass, required this.stats});
 
 
   @override
   Widget build(BuildContext context) {
-    final combatStats = characterClass.combatStats;
+    final combatStats = visionaryClass.combatStats;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(characterClass.displayName),
+        title: Text(visionaryClass.displayName),
         actions: [
           IconButton(
             icon: const Icon(Icons.bar_chart),
@@ -24,7 +27,7 @@ class VisionaryCombatStatsScreen extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => VisionaryStatsScreen(characterClass: characterClass),
+                  builder: (context) => VisionaryStatsScreen(visionary: visionaryClass),
                 ),
               );
             },
@@ -37,7 +40,7 @@ class VisionaryCombatStatsScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              characterClass.description,
+              visionaryClass.description,
               style: const TextStyle(fontSize: 16),
             ),
             const SizedBox(height: 20),
@@ -54,9 +57,9 @@ class VisionaryCombatStatsScreen extends StatelessWidget {
             const SizedBox(height: 24),
             Row(
               children: [
-                _buildAttributeTag('Class: ${characterClass.classType}'),
+                _buildAttributeTag('Class: ${visionaryClass.classType}'),
                 const SizedBox(width: 12),
-                _buildAttributeTag('Weapon: ${characterClass.weaponType}'),
+                _buildAttributeTag('Weapon: ${visionaryClass.weaponType}'),
               ],
             ),
           ],
