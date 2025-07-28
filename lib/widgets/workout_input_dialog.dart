@@ -1,4 +1,4 @@
-// Updated to support RPG classes, workouts, XP tracking, and new bottom menu system
+// workout_input_dialog.dart
 
 import 'package:flutter/material.dart';
 import 'package:fitness_rpg/models/workout_entry.dart';

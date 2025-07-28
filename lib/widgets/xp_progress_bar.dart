@@ -1,32 +1,35 @@
+// xp_progress_bar.dart (Modified)
 import 'package:flutter/material.dart';
-import 'dart:math';
+import '../models/visionary_data.dart';
 
+
+// No longer need 'dart:math' here if formulas are external
 class XPProgressBar extends StatelessWidget {
-  final int xp;
-  const XPProgressBar({super.key, required this.xp});
+  final int currentLevel;
+  final int xpIntoCurrentLevel;
+  final int xpNeededForNextLevel;
 
-  int xpForLevel(int level) => level == 1 ? 0 : (80 * pow(level, 1.3)).floor();
-
-  int getLevelFromXp(int xp) {
-    int level = 1;
-    while (level < 150 && xp >= xpForLevel(level + 1)) {
-      level++;
-    }
-    return level;
-  }
+  const XPProgressBar({
+    super.key,
+    required this.currentLevel,
+    required this.xpIntoCurrentLevel,
+    required this.xpNeededForNextLevel,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final int level = getLevelFromXp(xp);
-    final int currentLevelXp = xpForLevel(level);
-    final int nextLevelXp = xpForLevel(level + 1);
-    final int xpForNext = nextLevelXp - currentLevelXp;
+    final int safeXpIntoLevel = xpIntoCurrentLevel.clamp(0, xpNeededForNextLevel);
+    final double progress = (xpNeededForNextLevel > 0)
+        ? (safeXpIntoLevel / xpNeededForNextLevel).clamp(0.0, 1.0)
+        : (currentLevel >= VisionaryData.maxLevel ? 1.0 : 0.0); // Show full if max level
 
-    final int rawXpIntoLevel = xp - currentLevelXp;
-    final int xpIntoLevel = rawXpIntoLevel.clamp(0, xpForNext);
-    final double progress = (xpIntoLevel / xpForNext).clamp(0.0, 1.0);
+    final String xpText = (xpNeededForNextLevel > 0 && currentLevel < VisionaryData.maxLevel)
+        ? '$safeXpIntoLevel / $xpNeededForNextLevel XP'
+        : (currentLevel >= VisionaryData.maxLevel ? "Max Level" : "$safeXpIntoLevel / $xpNeededForNextLevel XP");
+
 
     return Column(
+      // ... same layout as before using these parameters ...
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         ClipRRect(
@@ -40,7 +43,7 @@ class XPProgressBar extends StatelessWidget {
         ),
         const SizedBox(height: 6),
         Text(
-          'Level $level • $xpIntoLevel / $xpForNext XP',
+          'Level $currentLevel • $xpText',
           style: const TextStyle(fontSize: 13),
         ),
       ],

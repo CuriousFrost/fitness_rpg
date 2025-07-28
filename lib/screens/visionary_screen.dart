@@ -1,8 +1,11 @@
+// visionary_screen.dart
+
 import 'package:flutter/material.dart';
 import '../models/visionary_data.dart';
 import '../screens/visionary_combat_stats_screen.dart';
 import '../models/combat_stats.dart';
-import'../models/visionary_class.dart';
+import '../models/visionary_class.dart';
+
 
 
 class VisionaryScreen extends StatelessWidget {
@@ -55,21 +58,33 @@ class VisionaryScreen extends StatelessWidget {
                   ],
                 ],
               ),
-              // visionary_screen.dart - onTap
+              // visionary_screen.dart - In the onTap callback
+// ...
               onTap: () {
+                final visionary = visionaries[index]; // This IS your VisionaryData object
+                final VisionaryClass visionaryEnum = VisionaryClass.fromString(visionary.classType);
+                final CombatStats currentCombatStats = visionary.combatStats; // These are base stats
+
+                // TODO: If your 'currentCombatStats' should be different from base stats
+                // (e.g., modified by level), you'll need to calculate them here.
+                // For now, assuming currentCombatStats are the ones to display on combat screen.
+
+                final int level = VisionaryData.classLevel[visionaryEnum] ?? 1;
+                final int xp = VisionaryData.classXp[visionaryEnum] ?? 0;
+                final int xpToNext = VisionaryData.xpToNextLevel(level);
+                final double xpProgress = (xpToNext > 0) ? (xp / xpToNext) : 0.0;
+
                 Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => VisionaryCombatStatsScreen(
-                      actualVisionaryClass: visionaryEnum, // Pass the VisionaryClass enum
-                      stats: currentCombatStats,
+                      visionaryData: visionary, // Pass the whole VisionaryData object
+                      currentDisplayStats: currentCombatStats, // Pass the combat stats to display
                       visionaryName: visionary.displayName,
                       level: level,
                       xp: xp,
                       xpToNextLevel: xpToNext,
                       xpProgress: xpProgress,
-                      description: visionary.description, // Add this
-                      weaponType: visionary.weaponType,   // Add this
                     ),
                   ),
                 );

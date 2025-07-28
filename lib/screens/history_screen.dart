@@ -1,5 +1,6 @@
-// screens/history_screen.dart
+//history_screen.dart
 import 'package:flutter/material.dart';
+import '../models/visionary_data.dart';
 import '../models/workout_entry.dart';
 import '../models/visionary_class.dart';
 import '../logic/workout_data.dart';
@@ -74,20 +75,24 @@ class _HistoryScreenState extends State<HistoryScreen> {
               onPressed: () {
                 int newXp;
                 String newDescription;
+                double? newDistance; // For distance-based workouts
 
+                // --- Calculate newXp, newDescription, newDistance based on inputs ---
                 if (isDistanceBased) {
-                  final double distance =
+                  final double distanceVal =
                       double.tryParse(distanceController.text) ?? 0;
+                  // Keep your existing XP calculation logic based on distance
                   newXp = (entry.type == WorkoutType.running)
-                      ? (distance * 10).round()
+                      ? (distanceVal * 10).round()
                       : (entry.type == WorkoutType.walking)
-                      ? (distance * 5).round()
-                      : (distance * 4).round(); // biking fallback
-                  newDescription = entry.type.generateDescription(distance);
+                      ? (distanceVal * 5).round()
+                      : (distanceVal * 4).round(); // biking fallback
+                  newDescription = entry.type.generateDescription(distanceVal);
+                  newDistance = distanceVal;
                 } else {
                   final int reps = int.tryParse(repsController.text) ?? 0;
                   final int weight = int.tryParse(weightController.text) ?? 0;
-
+                  // Keep your existing XP calculation logic for weight/reps
                   double multiplier;
                   switch (entry.type) {
                     case WorkoutType.weightArm:
@@ -112,28 +117,50 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   );
                 }
 
-                final int oldXp = entry.xp;
-                workoutData.characterXp[entry.visionary] =
-                    (workoutData.characterXp[entry.visionary] ?? 0) -
-                    oldXp +
-                    newXp;
-                if (workoutData.characterXp[entry.visionary]! < 0) {
-                  workoutData.characterXp[entry.visionary] = 0;
-                }
-
+                // --- Create the new WorkoutEntry ---
+                // IMPORTANT: Decide if you want to update the timestamp or keep the original.
+                // Using entry.timestamp keeps the original workout time. DateTime.now() updates it.
                 final updatedEntry = WorkoutEntry(
                   visionary: entry.visionary,
                   type: entry.type,
                   description: newDescription,
                   xp: newXp,
-                  timestamp: DateTime.now(),
+                  timestamp:
+                      entry.timestamp, // Or DateTime.now() if that's intended
+                  distance:
+                      newDistance, // Make sure to include updated distance
                 );
 
-                setState(() {
-                  final oldEntry = workoutData.entries[index];
-                  workoutData.updateWorkout(oldEntry, updatedEntry);
-                });
-                Navigator.pop(context);
+                // --- Update WorkoutData (which handles its own _characterXp) ---
+                // 'actualIndex' was passed as 'index' to showEditWorkoutDialog,
+                // or retrieve the original entry to pass to updateWorkout.
+                // The 'entry' passed into this dialog is the original entry.
+                workoutData.updateWorkout(
+                  entry,
+                  updatedEntry,
+                ); // WorkoutData will notifyListeners
+
+                // --- Update VisionaryData ---
+                // You need a method in VisionaryData to handle XP adjustment for edits.
+                // This could be removeXp and then addXp, or a dedicated updateXp method.
+                // Let's assume you'll add removeXpAndAdjustLevel and use addXpAndLevelUp.
+
+                // 1. Remove old XP from VisionaryData
+                VisionaryData.removeXpAndAdjustLevel(
+                  entry.visionary,
+                  entry.xp,
+                ); // You'll need to implement this
+
+                // 2. Add new XP to VisionaryData
+                VisionaryData.addXpAndLevelUp(
+                  updatedEntry.visionary,
+                  updatedEntry.xp,
+                );
+
+                // No need for direct manipulation of workoutData.characterXp here.
+                // No need for setState() here if HistoryScreen listens to workoutData.
+
+                Navigator.pop(context); // Close the dialog
               },
               child: const Text('Save'),
             ),
@@ -274,20 +301,23 @@ class _HistoryScreenState extends State<HistoryScreen> {
                                   false;
 
                               if (confirmed) {
-                                setState(() {
-                                  final xp = entry.xp;
-                                  final classKey = entry.visionary;
-                                  workoutData.characterXp[classKey] =
-                                      (workoutData.characterXp[classKey] ?? 0) -
-                                      xp;
-                                  if (workoutData.characterXp[classKey]! < 0) {
-                                    workoutData.characterXp[classKey] = 0;
-                                  }
-                                  final entryToDelete =
-                                      workoutData.entries[actualIndex];
-                                  workoutData.deleteWorkout(entryToDelete);
-                                });
-                                return true;
+                                // final entryToDelete = workoutData.entries[actualIndex]; // original entry to delete
+                                final entryToDelete =
+                                    entry; // 'entry' from the ListView.builder IS the correct one here
+
+                                // 1. Update VisionaryData FIRST (or track XP before workoutData changes it)
+                                VisionaryData.removeXpAndAdjustLevel(
+                                  entryToDelete.visionary,
+                                  entryToDelete.xp,
+                                );
+
+                                // 2. Update WorkoutData (which will also update its own _characterXp)
+                                workoutData.deleteWorkout(
+                                  entryToDelete,
+                                ); // This will call notifyListeners
+
+                                // No setState needed here if HistoryScreen is listening to workoutData
+                                return true; // Confirm the dismissal
                               }
                             }
                             return false;

@@ -1,5 +1,6 @@
-import '../models/visionary_class.dart';
+//workout_entry.dart
 
+import '../models/visionary_class.dart';
 
 enum WorkoutType {
   running,

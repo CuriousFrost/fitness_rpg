@@ -1,46 +1,55 @@
-// visionary_combat_stats_screen.dart
-
 import 'package:flutter/material.dart';
+import '../models/visionary_data.dart'; // Import VisionaryData
 import '../models/visionary_class.dart';
-import 'visionary_stats_screen.dart';
 import '../models/combat_stats.dart';
+import './visionary_stats_screen.dart';
 
 class VisionaryCombatStatsScreen extends StatelessWidget {
-  final VisionaryClass actualVisionaryClass;
-  final CombatStats stats;
-  final String visionaryName;
+  final VisionaryData visionaryData; // Changed from individual fields
+  final CombatStats currentDisplayStats; // Potentially modified stats for display
+  final String visionaryName; // Can still be useful for title, or get from visionaryData
   final int level;
   final int xp;
   final int xpToNextLevel;
   final double xpProgress;
-  final String description;
-  final String weaponType;
+  // description and weaponType can be accessed from visionaryData.description, visionaryData.weaponType
+  // combatStats (base stats) can be accessed from visionaryData.combatStats
 
   const VisionaryCombatStatsScreen({
     super.key,
-    required this.actualVisionaryClass,
-    required this.stats,
-    required this.visionaryName,
+    required this.visionaryData, // Expect VisionaryData
+    required this.currentDisplayStats, // This would be the stats possibly modified by level/gear etc.
+    required this.visionaryName, // Or derive from visionaryData.displayName
     required this.level,
     required this.xp,
     required this.xpToNextLevel,
     required this.xpProgress,
-    required this.description,
-    required this.weaponType,
   });
 
   @override
-  Widget build(BuildContext context) { // context is available here
+  Widget build(BuildContext context) {
+    // Use visionaryData for stats and info
+    final CombatStats baseCombatStats = visionaryData.combatStats;
+    final String description = visionaryData.description;
+    final String weaponType = visionaryData.weaponType;
+    final VisionaryClass classEnum = VisionaryClass.fromString(visionaryData.classType);
+
+
     return Scaffold(
       appBar: AppBar(
-        title: Text(visionaryName),
+        title: Text(visionaryName), // Or visionaryData.displayName
         actions: [
           IconButton(
             icon: const Icon(Icons.bar_chart),
             tooltip: 'Workout Stats',
             onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('VisionaryStatsScreen navigation needs review.'))
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => VisionaryStatsScreen(
+                    visionary: visionaryData, // Pass the full VisionaryData object
+                  ),
+                ),
               );
             },
           ),
@@ -62,18 +71,19 @@ class VisionaryCombatStatsScreen extends StatelessWidget {
               spacing: 16,
               runSpacing: 16,
               children: [
-                _buildStatTile(context, 'HP', stats.hp.toString()),      // Pass context
-                _buildStatTile(context, 'ATK', stats.atk.toString()),    // Pass context
-                _buildStatTile(context, 'DEF', stats.def.toString()),    // Pass context
-                _buildStatTile(context, 'SPD', stats.spd.toString()),    // Pass context
+                // Use currentDisplayStats for what's shown, baseCombatStats if you want to show base
+                _buildStatTile(context, 'HP', currentDisplayStats.hp.toString()),
+                _buildStatTile(context, 'ATK', currentDisplayStats.atk.toString()),
+                _buildStatTile(context, 'DEF', currentDisplayStats.def.toString()),
+                _buildStatTile(context, 'SPD', currentDisplayStats.spd.toString()),
               ],
             ),
             const SizedBox(height: 24),
             Row(
               children: [
-                _buildAttributeTag(context, 'Class: ${actualVisionaryClass.displayName}'), // Pass context
+                _buildAttributeTag(context, 'Class: ${classEnum.displayName}'), // Use displayName from enum
                 const SizedBox(width: 12),
-                _buildAttributeTag(context, 'Weapon: $weaponType'),                    // Pass context
+                _buildAttributeTag(context, 'Weapon: $weaponType'),
               ],
             ),
           ],
