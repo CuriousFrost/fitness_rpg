@@ -5,9 +5,10 @@ import 'package:flutter/material.dart';
 import '../models/visionary_class.dart';
 import '../models/workout_entry.dart';
 import '../widgets/workout_input_dialog.dart';
-import '../logic/workout_data.dart';
-import '../models/visionary_data.dart';
-import 'package:collection/collection.dart';
+import '../logic/workout_data.dart'; // Ensure this is your global instance or provided
+import '../models/visionary_data.dart'; // For calculateLevelAndProgress and constants
+// import 'package:collection/collection.dart'; // Not strictly needed here anymore for this logic
+// import 'package:provider/provider.dart'; // UNCOMMENT if you set up Provider for workoutData
 
 class WorkoutScreen extends StatefulWidget {
   const WorkoutScreen({super.key});
@@ -22,38 +23,41 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
   @override
   void initState() {
     super.initState();
-    // It's good practice to ensure context is available for PageStorage.
-    // Also, make sure that VisionaryData.load() and workoutData.load()
-    // are called before this screen might try to use their data.
-    // Often this is done in main.dart or a loading screen.
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      // Ensure data is loaded before trying to read from it or PageStorage
-      // If these are already loaded reliably at app startup, you might not need to await them here.
-      // However, it's safer if this screen might be the first to access them.
-      // await workoutData.load(); // Assuming workoutData is an instance you can call load on
-      // await VisionaryData.load(); // Assuming VisionaryData has a static load method
+      if (!mounted) return;
 
-      if (!mounted) return; // Check if the widget is still in the tree
-
-      final stored = PageStorage.of(context)
-          .readState(context, identifier: 'selectedClass') as String?;
+      final stored =
+          PageStorage.of(
+                context,
+              ).readState(context, identifier: 'selectedClass')
+              as String?;
       if (stored != null) {
-        setState(() { // Call setState to update the UI if selectedClass changes
-          selectedClass = VisionaryClass.values.firstWhere(
-                (c) => c.name == stored);
+        setState(() {
+          selectedClass = VisionaryClass.values.firstWhereOrNull(
+            (c) => c.name == stored,
+          ); // Use firstWhereOrNull
         });
-      } else if (VisionaryClass.values.isNotEmpty) {
-        // Optionally set a default if none is stored and you want one
-        // setState(() {
-        //   selectedClass = VisionaryClass.values.first;
-        // });
       }
-      // If you modify selectedClass here, ensure it's within a setState call
-      // if it's meant to trigger a rebuild.
+      // If using Provider for workoutData, you might listen to it here for updates
+      // workoutData.addListener(_onWorkoutDataChanged);
     });
-  } // <--- initState ENDS HERE
+  }
 
-  // _onClassChanged should be a method of _WorkoutScreenState, not inside initState
+  // Optional: If not using Provider's Consumer/watch, a listener can help
+  // void _onWorkoutDataChanged() {
+  //   if (mounted) {
+  //     setState(() {
+  //       // This will cause the Builder widget to rebuild if selectedClass is not null
+  //     });
+  //   }
+  // }
+
+  // @override
+  // void dispose() {
+  //   // workoutData.removeListener(_onWorkoutDataChanged); // If you added a listener
+  //   super.dispose();
+  // }
+
   void _onClassChanged(VisionaryClass? newValue) {
     setState(() {
       selectedClass = newValue;
@@ -63,9 +67,11 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
     });
   }
 
-  // build method should be a method of _WorkoutScreenState, not inside initState
   @override
   Widget build(BuildContext context) {
+    // If using Provider:
+    // final workoutDataProvider = context.watch<WorkoutData>(); // Rebuilds when workoutData notifies
+
     return Scaffold(
       appBar: AppBar(title: const Text('Workout Log')),
       body: Padding(
@@ -81,7 +87,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                 border: OutlineInputBorder(),
               ),
               isExpanded: true,
-              onChanged: _onClassChanged, // Correctly references the method
+              onChanged: _onClassChanged,
               items: VisionaryClass.values.map((c) {
                 return DropdownMenuItem<VisionaryClass>(
                   value: c,
@@ -92,121 +98,133 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
             const SizedBox(height: 20),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                  minimumSize: const Size(double.infinity, 48)),
+                minimumSize: const Size(double.infinity, 48),
+              ),
               onPressed: selectedClass == null
                   ? null
                   : () {
-                showDialog(
-                  context: context,
-                  builder: (context) => WorkoutInputDialog(
-                    onWorkoutLogged: (workoutType, description,
-                        xpFromDialog, {double? distance}) async {
-                      if (selectedClass == null) return;
+                      showDialog(
+                        context: context,
+                        builder: (context) => WorkoutInputDialog(
+                          onWorkoutLogged: (workoutType, description, xpFromDialog, {double? distance}) async {
+                            if (selectedClass == null) return;
 
-                      final entry = WorkoutEntry(
-                        visionary: selectedClass!,
-                        type: workoutType,
-                        xp: xpFromDialog,
-                        description: description,
-                        distance: distance,
-                        timestamp: DateTime.now(),
-                      );
+                            // --- Logic for XP Gain Popup ---
+                            // 1. Get total XP *before* adding the new workout's XP
+                            final int totalXpBeforeThisWorkout =
+                                workoutData.characterXp[selectedClass!] ?? 0;
 
-                      // 1. Add entry to WorkoutData.
-                      // This should ONLY update WorkoutData's internal state and save itself.
-                      workoutData.addWorkout(entry);
+                            // 2. Calculate level/progress *before*
+                            final Map<String, int> progressBefore =
+                                VisionaryData.calculateLevelAndProgress(
+                                  totalXpBeforeThisWorkout,
+                                );
 
-                      // 2. Update VisionaryData with the XP from THIS workout entry.
-                      VisionaryData.addXpAndLevelUp(
-                          selectedClass!, xpFromDialog);
+                            // 3. Create the workout entry
+                            final entry = WorkoutEntry(
+                              visionary: selectedClass!,
+                              type: workoutType,
+                              xp: xpFromDialog,
+                              description: description,
+                              distance: distance,
+                              timestamp: DateTime.now(),
+                            );
 
-                      // UI Update and Popup
-                      if (mounted) {
-                        setState(() {}); // Update WorkoutScreen UI
+                            // 4. Add entry to WorkoutData. This updates its internal state (_characterXp)
+                            // and calls notifyListeners().
+                            workoutData.addWorkout(entry);
 
-                        WidgetsBinding.instance.addPostFrameCallback((_) {
-                          if (!mounted) return; // Check mounted again
-
-                          final int actualGainedXp = xpFromDialog;
-                          final int finalLevel =
-                              VisionaryData.classLevel[selectedClass!] ?? 1;
-                          final int finalXpIntoLevel =
-                              VisionaryData.classXp[selectedClass!] ?? 0;
-                          final int xpNeededForFinalLevel =
-                          VisionaryData.xpToNextLevel(finalLevel);
-
-                          int oldXpDisplayForPopup;
-                          // If a level up happened, the xp gain in the new level starts from 0 (or from what was left after previous level)
-                          // If no level up, it's finalXp - gain.
-                          if (VisionaryData.classLevel[selectedClass!]! > (VisionaryData.classLevel[selectedClass!]! - (finalXpIntoLevel < actualGainedXp ? 1:0) ) && finalXpIntoLevel < actualGainedXp) {
-                            // This logic is trying to determine if a level up occurred from this XP.
-                            // A simpler way: was the XP *before* adding xpFromDialog in a lower level or same level but less XP?
-                            // Let's use the logic provided for oldXpDisplayForPopup
-                            oldXpDisplayForPopup = (finalXpIntoLevel - actualGainedXp).clamp(0, xpNeededForFinalLevel);
-                            if (finalXpIntoLevel < actualGainedXp) { // Indicates a level up likely happened and current finalXpIntoLevel is for the new level
-                              oldXpDisplayForPopup = 0; // Start animation from 0 for the new level bar
+                            // 5. If not using Provider.watch or Consumer for the XP bar below,
+                            //    this setState will help trigger its rebuild.
+                            if (mounted) {
+                              setState(() {});
                             }
 
-                          } else {
-                            oldXpDisplayForPopup = (finalXpIntoLevel - actualGainedXp).clamp(0, xpNeededForFinalLevel);
-                          }
-                          // Ensure it's not negative and not more than needed for the level
-                          oldXpDisplayForPopup = oldXpDisplayForPopup.clamp(0, xpNeededForFinalLevel);
+                            // --- UI Update and Popup Call ---
+                            WidgetsBinding.instance.addPostFrameCallback((_) {
+                              if (!mounted) return;
 
+                              // 6. Get total XP *after* adding the new workout's XP
+                              final int totalXpAfterThisWorkout =
+                                  workoutData.characterXp[selectedClass!] ?? 0;
 
-                          // More robust calculation for oldXpDisplayForPopup
-                          // This requires knowing total XP *before* VisionaryData.addXpAndLevelUp processed xpFromDialog for the current level
-                          // For simplicity, we're using the difference in the *final* level's XP.
-                          // If finalXpIntoLevel is 50, and actualGainedXp is 30 (no level up), old was 20.
-                          // If finalXpIntoLevel is 20 (new level), and actualGainedXp was 100 (level up), old on new bar is 0.
-                          int previousXpForPopupCalculation = (VisionaryData.classXp[selectedClass!] ?? 0) - actualGainedXp;
-                          int previousLevelForPopup = VisionaryData.classLevel[selectedClass!] ?? 1;
+                              // 7. Calculate level/progress *after*
+                              final Map<String, int> progressAfter =
+                                  VisionaryData.calculateLevelAndProgress(
+                                    totalXpAfterThisWorkout,
+                                  );
 
-                          if (previousXpForPopupCalculation < 0) {
-                            // Went into negative, meaning a level up occurred
-                            oldXpDisplayForPopup = 0; // Start new level bar from 0
-                            // A more complex scenario would track how much was needed for the *previous* level
-                            // but for animating the *current/final* level bar, starting from 0 is often fine.
-                          } else {
-                            oldXpDisplayForPopup = previousXpForPopupCalculation;
-                          }
-                          oldXpDisplayForPopup = oldXpDisplayForPopup.clamp(0, xpNeededForFinalLevel);
+                              final int actualGainedXp = xpFromDialog;
+                              final int finalLevel = progressAfter['level']!;
+                              final int finalXpIntoLevel =
+                                  progressAfter['xpIntoCurrentLevel']!;
+                              final int xpNeededForFinalLevel =
+                                  progressAfter['xpNeededForNextLevel']!;
 
+                              // oldXpDisplayForPopup should be the xpIntoCurrentLevel *before* this workout,
+                              // but for the level the character *ended up in*.
+                              // If a level up occurred, the "old" XP on the new level's bar is 0.
+                              // If no level up, it's currentXP - gainedXP for that same level.
+                              int oldXpDisplayForPopup;
+                              if (progressAfter['level']! >
+                                  progressBefore['level']!) {
+                                // Level up occurred
+                                oldXpDisplayForPopup = 0;
+                              } else {
+                                // Same level
+                                oldXpDisplayForPopup =
+                                    progressBefore['xpIntoCurrentLevel']!;
+                              }
 
-                          showXpGainPopupWithBar(
-                            context,
-                            selectedClass!,
-                            oldXpDisplayForPopup,
-                            finalXpIntoLevel,
-                            finalLevel,
-                            xpNeededForFinalLevel,
-                            actualGainedXp,
-                          );
-                        });
-                      }
+                              // This ensures the animation doesn't start from a negative or beyond the bar.
+                              oldXpDisplayForPopup = oldXpDisplayForPopup.clamp(
+                                0,
+                                xpNeededForFinalLevel,
+                              );
+
+                              showXpGainPopupWithBar(
+                                context,
+                                selectedClass!,
+                                oldXpDisplayForPopup, // XP bar starts here for animation
+                                finalXpIntoLevel, // XP bar ends here for animation
+                                finalLevel, // The level achieved
+                                xpNeededForFinalLevel, // Total XP needed for this (final) level
+                                actualGainedXp, // The amount of XP just gained
+                                // Optional: pass levelBefore if your popup uses it for "Level Up!" text
+                                levelBefore: progressBefore['level']!,
+                              );
+                            });
+                          },
+                        ),
+                      );
                     },
-                  ),
-                );
-              },
               child: const Text('Log Workout'),
             ),
             const SizedBox(height: 20),
             if (selectedClass != null)
-            // Using a simple ValueListenableBuilder for demonstration.
-            // If VisionaryData's maps are not ValueNotifiers,
-            // this will only build once unless the key changes or an ancestor rebuilds.
-            // setState() in onWorkoutLogged will trigger a rebuild of this part.
-              Builder( // Using Builder to get updated values after setState
+              // OPTION 1: Using the existing Builder and relying on setState in onWorkoutLogged
+              // This works because workoutData is global, and setState will rebuild this part.
+              Builder(
                 builder: (context) {
-                  final level = VisionaryData.classLevel[selectedClass!] ?? 1;
-                  final currentXp = VisionaryData.classXp[selectedClass!] ?? 0;
-                  final nextXp = VisionaryData.xpToNextLevel(level);
-                  // Ensure nextXp is not zero to avoid division by zero,
-                  // and progress is clamped between 0.0 and 1.0.
-                  final double progress = (nextXp > 0 && currentXp <= nextXp)
-                      ? (currentXp.toDouble() / nextXp.toDouble())
-                      : (level >= VisionaryData.maxLevel || currentXp >=nextXp && nextXp > 0 ? 1.0 : 0.0) ;
+                  // Fetch total XP from the global workoutData instance
+                  final int totalHistoricalXp =
+                      workoutData.characterXp[selectedClass!] ?? 0;
 
+                  // Calculate current level and progress using VisionaryData utility
+                  final Map<String, int> levelProgress =
+                      VisionaryData.calculateLevelAndProgress(
+                        totalHistoricalXp,
+                      );
+                  final int level = levelProgress['level']!;
+                  final int currentXp = levelProgress['xpIntoCurrentLevel']!;
+                  final int nextXp = levelProgress['xpNeededForNextLevel']!;
+
+                  final double progressFraction = (nextXp > 0)
+                      ? (currentXp.toDouble() / nextXp.toDouble()).clamp(
+                          0.0,
+                          1.0,
+                        )
+                      : (level >= VisionaryData.maxLevel ? 1.0 : 0.0);
 
                   return Card(
                     elevation: 2,
@@ -220,36 +238,66 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                             style: Theme.of(context).textTheme.titleMedium,
                           ),
                           const SizedBox(height: 8),
-                          if (level < VisionaryData.maxLevel) ...[
+                          if (level < VisionaryData.maxLevel && nextXp > 0) ...[
                             Text("XP: $currentXp / $nextXp"),
                             const SizedBox(height: 4),
                             LinearProgressIndicator(
-                              value: progress.clamp(0.0, 1.0), // Ensure clamped
+                              value: progressFraction,
                               minHeight: 10,
                               backgroundColor: Colors.grey[300],
                               valueColor: AlwaysStoppedAnimation<Color>(
-                                  Theme.of(context).primaryColor),
+                                Theme.of(context).primaryColor,
+                              ),
                             ),
                           ] else ...[
-                            Text("XP: $currentXp (Max Level Reached)"), // Show current XP even at max
+                            Text("XP: $currentXp (Max Level Reached)"),
                             const SizedBox(height: 4),
                             LinearProgressIndicator(
                               value: 1.0, // Full bar at max level
                               minHeight: 10,
                               backgroundColor: Colors.grey[300],
-                              valueColor:
-                              const AlwaysStoppedAnimation<Color>(Colors.amber),
+                              valueColor: const AlwaysStoppedAnimation<Color>(
+                                Colors.amber,
+                              ),
                             ),
-                          ]
+                          ],
                         ],
                       ),
                     ),
                   );
                 },
               ),
+            // OPTION 2: If you use Provider for workoutData (recommended for larger apps)
+            // UNCOMMENT this and COMMENT OUT the Builder above if you go with Provider
+            // Consumer<WorkoutData>(
+            //   builder: (context, wd, child) {
+            //     if (selectedClass == null) return const SizedBox.shrink();
+
+            //     final int totalHistoricalXp = wd.characterXp[selectedClass!] ?? 0;
+            //     final Map<String, int> levelProgress = VisionaryData.calculateLevelAndProgress(totalHistoricalXp);
+            //     final int level = levelProgress['level']!;
+            //     final int currentXp = levelProgress['xpIntoCurrentLevel']!;
+            //     final int nextXp = levelProgress['xpNeededForNextLevel']!;
+            //     final double progressFraction = (nextXp > 0)
+            //         ? (currentXp.toDouble() / nextXp.toDouble()).clamp(0.0, 1.0)
+            //         : (level >= VisionaryData.maxLevel ? 1.0 : 0.0);
+
+            //     return Card( /* ... same card structure as above ... */ );
+            //   },
+            // ),
           ],
         ),
       ),
     );
-  } // <--- build method ENDS HERE
+  }
+}
+
+// Helper for firstWhereOrNull if you don't have collection package or want to avoid it for one use
+extension FirstWhereOrNullExtension<E> on Iterable<E> {
+  E? firstWhereOrNull(bool Function(E element) test) {
+    for (E element in this) {
+      if (test(element)) return element;
+    }
+    return null;
+  }
 }

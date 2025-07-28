@@ -3,9 +3,8 @@
 import 'package:flutter/material.dart';
 import '../models/visionary_data.dart';
 import '../screens/visionary_combat_stats_screen.dart';
-import '../models/combat_stats.dart';
 import '../models/visionary_class.dart';
-
+import '../logic/workout_data.dart'; // Import WorkoutData
 
 
 class VisionaryScreen extends StatelessWidget {
@@ -13,6 +12,12 @@ class VisionaryScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Assuming workoutData is available via Provider or as a global instance
+    // If global: final wd = workoutData;
+    // If Provider: final wd = Provider.of<WorkoutData>(context);
+    // For simplicity, let's use the global instance workoutData directly here.
+    // It's better to use Provider for cleaner dependency management.
+
     final visionaries = VisionaryData.predefinedVisionaries;
 
     return Scaffold(
@@ -22,69 +27,60 @@ class VisionaryScreen extends StatelessWidget {
       body: ListView.builder(
         itemCount: visionaries.length,
         itemBuilder: (context, index) {
-          final visionary = visionaries[index]; // This is a VisionaryData object
-          final VisionaryClass visionaryEnum = VisionaryClass.fromString(visionary.classType); // Get the enum
-          final CombatStats currentCombatStats = visionary.combatStats;
-
-// CORRECT WAY to get level, XP, etc.
-          final int level = VisionaryData.classLevel[visionaryEnum] ?? 1;
-          final int xp = VisionaryData.classXp[visionaryEnum] ?? 0;
-          final int xpToNext = VisionaryData.xpToNextLevel(level); // Call as a static method
-          final double xpProgress = (xpToNext > 0) ? (xp / xpToNext) : 0.0;
+          final visionaryDef = visionaries[index]; // This is a VisionaryData object (definition)
+          final VisionaryClass visionaryEnum = VisionaryClass.fromString(visionaryDef.classType);
+          // Get total historical XP from WorkoutData
+          final int totalHistoricalXp = workoutData.characterXp[visionaryEnum] ?? 0;
+          // Calculate current level and progress using VisionaryData utility
+          final Map<String, int> levelProgress = VisionaryData.calculateLevelAndProgress(totalHistoricalXp);
+          final int currentLevel = levelProgress['level']!;
+          final int xpIntoCurrentLevel = levelProgress['xpIntoCurrentLevel']!;
+          final int xpNeededForNext = levelProgress['xpNeededForNextLevel']!;
+          final double xpProgressFraction = (xpNeededForNext > 0)
+              ? (xpIntoCurrentLevel.toDouble() / xpNeededForNext.toDouble()).clamp(0.0, 1.0)
+              : (currentLevel >= VisionaryData.maxLevel ? 1.0 : 0.0);
 
           return Card(
             margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             elevation: 4,
             child: ListTile(
-              leading: CircleAvatar(
-                backgroundColor: Colors.blueGrey[100],
-                child: Text(visionary.displayName[0]),
-              ),
-              title: Text(visionary.displayName),
+              leading: CircleAvatar( /* ... */ ),
+              title: Text(visionaryDef.displayName),
               subtitle: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Class: ${visionary.classType}'), // This is fine, classType is a String in VisionaryData
-                  Text('Level: $level'), // Use the 'level' variable you defined above
-                  if (xpToNext > 0) ...[ // Check to prevent division by zero and show relevant UI
+                  Text('Class: ${visionaryEnum.displayName}'), // <--- USE THE ENUM'S DISPLAY NAME HERE
+                  Text('Level: $currentLevel'),
+                  if (currentLevel < VisionaryData.maxLevel && xpNeededForNext > 0) ...[
                     LinearProgressIndicator(
-                      value: xpProgress, // Use the 'xpProgress' variable
+                      value: xpProgressFraction,
                       backgroundColor: Colors.grey[300],
                       valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
                     ),
-                    Text('$xp / $xpToNext XP'), // Use 'xp' and 'xpToNext' variables
+                    Text('$xpIntoCurrentLevel / $xpNeededForNext XP'),
                   ] else ...[
-                    Text('$xp XP (Max Level or Error)'), // Handle cases where xpToNext might be 0
+                    Text('$xpIntoCurrentLevel XP (Max Level)'),
+                    LinearProgressIndicator( // Show full bar at max
+                      value: 1.0,
+                      backgroundColor: Colors.grey[300],
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.amber),
+                    ),
                   ],
                 ],
               ),
-              // visionary_screen.dart - In the onTap callback
-// ...
               onTap: () {
-                final visionary = visionaries[index]; // This IS your VisionaryData object
-                final VisionaryClass visionaryEnum = VisionaryClass.fromString(visionary.classType);
-                final CombatStats currentCombatStats = visionary.combatStats; // These are base stats
-
-                // TODO: If your 'currentCombatStats' should be different from base stats
-                // (e.g., modified by level), you'll need to calculate them here.
-                // For now, assuming currentCombatStats are the ones to display on combat screen.
-
-                final int level = VisionaryData.classLevel[visionaryEnum] ?? 1;
-                final int xp = VisionaryData.classXp[visionaryEnum] ?? 0;
-                final int xpToNext = VisionaryData.xpToNextLevel(level);
-                final double xpProgress = (xpToNext > 0) ? (xp / xpToNext) : 0.0;
-
+                // Pass the calculated data to the stats screen
                 Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => VisionaryCombatStatsScreen(
-                      visionaryData: visionary, // Pass the whole VisionaryData object
-                      currentDisplayStats: currentCombatStats, // Pass the combat stats to display
-                      visionaryName: visionary.displayName,
-                      level: level,
-                      xp: xp,
-                      xpToNextLevel: xpToNext,
-                      xpProgress: xpProgress,
+                      visionaryData: visionaryDef,
+                      currentDisplayStats: visionaryDef.combatStats, // Base stats, adjust if they scale with level
+                      visionaryName: visionaryDef.displayName,
+                      level: currentLevel,
+                      xp: xpIntoCurrentLevel,
+                      xpToNextLevel: xpNeededForNext,
+                      xpProgress: xpProgressFraction,
                     ),
                   ),
                 );

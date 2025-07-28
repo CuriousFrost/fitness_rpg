@@ -120,16 +120,17 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 // --- Create the new WorkoutEntry ---
                 // IMPORTANT: Decide if you want to update the timestamp or keep the original.
                 // Using entry.timestamp keeps the original workout time. DateTime.now() updates it.
+                final WorkoutEntry originalEntry = entry; // The entry being edited
+
                 final updatedEntry = WorkoutEntry(
-                  visionary: entry.visionary,
-                  type: entry.type,
+                  visionary: originalEntry.visionary,
+                  type: originalEntry.type,
                   description: newDescription,
                   xp: newXp,
-                  timestamp:
-                      entry.timestamp, // Or DateTime.now() if that's intended
-                  distance:
-                      newDistance, // Make sure to include updated distance
+                  timestamp: originalEntry.timestamp, // Or DateTime.now()
+                  distance: newDistance,
                 );
+
 
                 // --- Update WorkoutData (which handles its own _characterXp) ---
                 // 'actualIndex' was passed as 'index' to showEditWorkoutDialog,
@@ -139,26 +140,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   entry,
                   updatedEntry,
                 ); // WorkoutData will notifyListeners
-
-                // --- Update VisionaryData ---
-                // You need a method in VisionaryData to handle XP adjustment for edits.
-                // This could be removeXp and then addXp, or a dedicated updateXp method.
-                // Let's assume you'll add removeXpAndAdjustLevel and use addXpAndLevelUp.
-
-                // 1. Remove old XP from VisionaryData
-                VisionaryData.removeXpAndAdjustLevel(
-                  entry.visionary,
-                  entry.xp,
-                ); // You'll need to implement this
-
-                // 2. Add new XP to VisionaryData
-                VisionaryData.addXpAndLevelUp(
-                  updatedEntry.visionary,
-                  updatedEntry.xp,
-                );
-
-                // No need for direct manipulation of workoutData.characterXp here.
-                // No need for setState() here if HistoryScreen listens to workoutData.
 
                 Navigator.pop(context); // Close the dialog
               },
@@ -301,23 +282,14 @@ class _HistoryScreenState extends State<HistoryScreen> {
                                   false;
 
                               if (confirmed) {
-                                // final entryToDelete = workoutData.entries[actualIndex]; // original entry to delete
-                                final entryToDelete =
-                                    entry; // 'entry' from the ListView.builder IS the correct one here
+                                final entryToDelete = entry; // 'entry' from the ListView.builder
 
-                                // 1. Update VisionaryData FIRST (or track XP before workoutData changes it)
-                                VisionaryData.removeXpAndAdjustLevel(
-                                  entryToDelete.visionary,
-                                  entryToDelete.xp,
-                                );
+                                // This single call updates _entries and _characterXp in WorkoutData
+                                // and notifies listeners.
+                                workoutData.deleteWorkout(entryToDelete);
 
-                                // 2. Update WorkoutData (which will also update its own _characterXp)
-                                workoutData.deleteWorkout(
-                                  entryToDelete,
-                                ); // This will call notifyListeners
-
-                                // No setState needed here if HistoryScreen is listening to workoutData
-                                return true; // Confirm the dismissal
+                                // REMOVE VisionaryData.removeXpAndAdjustLevel(...)
+                                return true;
                               }
                             }
                             return false;

@@ -29,15 +29,9 @@ class VisionaryData {
   // ------------------------------------------------------------------
   // Static Members (Global data/utilities related to all Visionaries)
   // ------------------------------------------------------------------
-  static final Map<VisionaryClass, int> classXp = {
-    for (var c in VisionaryClass.values) c: 0,
-  };
 
-  static final Map<VisionaryClass, int> classLevel = {
-    for (var c in VisionaryClass.values) c: 1,
-  };
-
-  static const int maxXpTotal = 152960;
+  static const int maxXpTotal =
+      152960; // Max XP a character can effectively have for leveling
   static const int maxLevel = 150;
   static const double levelXpMultiplier = 1.2;
   static const int baseXpForLevelUp = 100;
@@ -47,150 +41,75 @@ class VisionaryData {
       return 0; // Or a very large number if you want to show a full bar but no more levels
     }
     if (currentLevel < 1) currentLevel = 1;
-    // Example: XP needed to complete currentLevel and reach currentLevel + 1
     return (baseXpForLevelUp * (pow(levelXpMultiplier, currentLevel - 1)))
         .round();
   }
+  /// Calculates the current level, XP into that level, and XP needed for the next level
+  /// based on the total historical XP accumulated for a visionary.
+  static Map<String, int> calculateLevelAndProgress(int totalHistoricalXp) {
+    int currentLevel = 1;
+    int xpIntoCurrentLevel = 0;
+    int accumulatedXpForPriorLevels = 0;
 
-  // --- XP AND LEVELING LOGIC ---
-  // V V V V V V V V V V V V V V V V V V V V V V V V V V V V V V V V V V V
-  // THIS IS WHERE THE MISSING METHOD GOES
-  // V V V V V V V V V V V V V V V V V V V V V V V V V V V V V V V V V V V
-  static void addXpAndLevelUp(VisionaryClass visionary, int xpGained) {
-    if (xpGained <= 0) return;
+    // Cap totalHistoricalXp at what's effectively needed for max level,
+    // though UI might show total if it exceeds this.
+    // This helps prevent infinite loops if totalHistoricalXp is unexpectedly huge.
+    int cappedHistoricalXp = totalHistoricalXp.clamp(0, maxXpTotal);
 
-    int currentLevel = classLevel[visionary] ?? 1;
-    int currentXpInLevel = classXp[visionary] ?? 0;
-
-    // Prevent XP gain if already at max level
-    if (currentLevel >= maxLevel) {
-      print(
-        "${visionary.name} is at max level ($maxLevel). No XP gained for leveling.",
-      );
-      // You might still want to call save() if other data could have changed,
-      // but for simple XP/Level, no change means no save needed for this path.
-      return;
-    }
-
-    currentXpInLevel += xpGained;
-
-    int xpNeededForNext = xpToNextLevel(currentLevel);
-
-    // Loop to handle multiple level-ups from a single XP gain
-    while (currentLevel < maxLevel &&
-        xpNeededForNext > 0 &&
-        currentXpInLevel >= xpNeededForNext) {
-      currentLevel++;
-      currentXpInLevel -= xpNeededForNext; // Subtract XP used for this level-up
-      classLevel[visionary] = currentLevel;
-      print("LEVEL UP! ${visionary.name} reached Level $currentLevel!");
-
-      if (currentLevel >= maxLevel) {
-        // If max level is reached, cap XP to the amount needed for the final level's bar
-        // or set to 0 if you prefer an empty bar at max (though full is common)
-        classXp[visionary] = xpToNextLevel(
-          maxLevel - 1,
-        ); // Fills the bar of the max level
-        classLevel[visionary] = maxLevel; // Ensure level is capped
-        print("${visionary.name} reached MAX Level $maxLevel!");
-        save(); // Save changes
-        return; // Exit as max level is reached
-      }
-      xpNeededForNext = xpToNextLevel(
-        currentLevel,
-      ); // Get XP needed for the new current level
-    }
-
-    // Update XP for the current level (which might be the same or a new one after leveling)
-    classXp[visionary] = currentXpInLevel;
-
-    print(
-      "VisionaryData: ${visionary.name} gained $xpGained XP. Level: $currentLevel, XP: ${classXp[visionary]}/$xpNeededForNext",
-    );
-    save(); // Save changes to SharedPreferences
-  }
-
-  static void removeXpAndAdjustLevel(VisionaryClass visionary, int xpToRemove) {
-    if (xpToRemove <= 0) return;
-
-    int currentLevel = classLevel[visionary] ?? 1;
-    int currentXpInLevel = classXp[visionary] ?? 0;
-    int totalXpForClass = 0; // We need the TOTAL XP for this visionary
-
-    // Calculate total historical XP for this visionary class
-    // This is tricky because you only store currentXpInLevel.
-    // Option A: Recalculate from level 1 up to currentLevel-1, then add currentXpInLevel
-    for (int i = 1; i < currentLevel; i++) {
-      totalXpForClass += xpToNextLevel(i);
-    }
-    totalXpForClass += currentXpInLevel;
-
-    // Now subtract the xpToRemove from this total
-    totalXpForClass -= xpToRemove;
-    if (totalXpForClass < 0) totalXpForClass = 0;
-
-    // Reset and recalculate level and XP from the new totalXpForClass
-    classLevel[visionary] = 1;
-    classXp[visionary] = 0;
-    currentLevel = 1;   // Reset for recalculation
-    currentXpInLevel = 0; // Reset for recalculation
-
-    int tempAccumulatedXp = 0;
-    while (true) {
-      int xpNeededForNext = xpToNextLevel(currentLevel);
-      if (currentLevel >= maxLevel) { // Reached max level during recalculation
-        classLevel[visionary] = maxLevel;
-        // If totalXpForClass exceeds XP for max level, cap it or show it as full.
-        // For simplicity, let's just assign remaining. This might make the bar exceed 100% if not handled in UI.
-        // A better way is to set classXp[visionary] to xpToNextLevel(maxLevel -1) if totalXpForClass is high enough.
-        classXp[visionary] = totalXpForClass - tempAccumulatedXp;
-        if (classXp[visionary]! > xpToNextLevel(maxLevel-1) && xpToNextLevel(maxLevel-1) > 0) {
-          classXp[visionary] = xpToNextLevel(maxLevel-1);
-        } else if (xpToNextLevel(maxLevel-1) == 0) { // Max level needs 0 more XP
-          classXp[visionary] = 0;
-        }
+    while (currentLevel < maxLevel) {
+      int xpNeededForThisLevel = xpToNextLevel(currentLevel);
+      if (xpNeededForThisLevel == 0) { // Should only happen if currentLevel is already maxLevel
         break;
       }
-
-      if (totalXpForClass >= tempAccumulatedXp + xpNeededForNext) {
-        tempAccumulatedXp += xpNeededForNext;
+      if (cappedHistoricalXp >= accumulatedXpForPriorLevels + xpNeededForThisLevel) {
+        accumulatedXpForPriorLevels += xpNeededForThisLevel;
         currentLevel++;
-        classLevel[visionary] = currentLevel;
       } else {
-        classXp[visionary] = totalXpForClass - tempAccumulatedXp;
         break;
       }
     }
 
-    print(
-      "VisionaryData: ${visionary.name} had $xpToRemove XP removed. New Level: ${classLevel[visionary]}, New XP: ${classXp[visionary]}",
-    );
-    save(); // Save changes
+    xpIntoCurrentLevel = cappedHistoricalXp - accumulatedXpForPriorLevels;
+
+    // If at max level, ensure xpIntoCurrentLevel doesn't exceed what's needed for the final bar
+    if (currentLevel == maxLevel) {
+      int xpForMaxLevelBar = xpToNextLevel(maxLevel -1); // XP to complete level before max
+      if (xpForMaxLevelBar > 0) {
+        xpIntoCurrentLevel = xpIntoCurrentLevel.clamp(0, xpForMaxLevelBar);
+      } else { // If maxLevel is 1, or xpToNextLevel(maxLevel-1) is 0 for some reason
+        xpIntoCurrentLevel = 0;
+      }
+    }
+
+
+    return {
+      'level': currentLevel,
+      'xpIntoCurrentLevel': xpIntoCurrentLevel,
+      'xpNeededForNextLevel': xpToNextLevel(currentLevel), // XP needed to complete the currentLevel
+    };
   }
-  // ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^
-  // END OF addXpAndLevelUp METHOD
-  // ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^
 
   static Future<void> save() async {
-    final prefs = await SharedPreferences.getInstance();
-    final xpJson = jsonEncode(classXp.map((k, v) => MapEntry(k.name, v)));
-    final levelJson = jsonEncode(classLevel.map((k, v) => MapEntry(k.name, v)));
-    await prefs.setString('classXp', xpJson);
-    await prefs.setString('classLevel', levelJson);
+    // final prefs = await SharedPreferences.getInstance();
+    // final xpJson = jsonEncode(classXp.map((k, v) => MapEntry(k.name, v))); // REMOVE
+    // final levelJson = jsonEncode(classLevel.map((k, v) => MapEntry(k.name, v))); // REMOVE
+    // await prefs.setString('classXp', xpJson); // REMOVE
+    // await prefs.setString('classLevel', levelJson); // REMOVE
+    print("VisionaryData.save() called - no classXp/classLevel to save anymore.");
   }
 
   static Future<void> load() async {
-    final prefs = await SharedPreferences.getInstance();
-    final xpJson = prefs.getString('classXp');
-    final levelJson = prefs.getString('classLevel');
-    if (xpJson != null && levelJson != null) {
-      final Map<String, dynamic> xpMap = jsonDecode(xpJson);
-      final Map<String, dynamic> levelMap = jsonDecode(levelJson);
-      for (var c in VisionaryClass.values) {
-        classXp[c] = xpMap[c.name] ?? 0;
-        classLevel[c] = levelMap[c.name] ?? 1;
-      }
-    }
+    // final prefs = await SharedPreferences.getInstance();
+    // final xpJson = prefs.getString('classXp'); // REMOVE
+    // final levelJson = prefs.getString('classLevel'); // REMOVE
+    // if (xpJson != null && levelJson != null) { // REMOVE THIS BLOCK
+    //   ...
+    // }
+    print("VisionaryData.load() called - no classXp/classLevel to load anymore.");
+    // Ensure VisionaryClass values are still available if needed by other logic during load
+    // for (var c in VisionaryClass.values) {
+    //   // No longer initializing classXp[c] or classLevel[c] here
+    // }
   }
 
   // Static list of predefined VisionaryData instances

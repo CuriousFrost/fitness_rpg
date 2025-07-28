@@ -35,25 +35,25 @@ extension CharacterClassName on VisionaryClass {
   String get displayName {
     switch (this) {
       case VisionaryClass.bloodletter:
-        return 'Bloodletter';
+        return 'Blade Artist';
       case VisionaryClass.airsnatcher:
-        return 'Airsnatcher';
+        return 'Elementalist';
       case VisionaryClass.saboteur:
-        return 'Saboteur';
+        return 'Gunsmith';
       case VisionaryClass.lightTheologist:
-        return 'Light Theologist';
+        return 'Materialist';
       case VisionaryClass.victimizer:
-        return 'Victimizer';
+        return 'Traditionalist';
       case VisionaryClass.symbolist:
-        return 'Symbolist';
+        return 'Materialist';
       case VisionaryClass.cosmologist:
-        return 'Cosmologist';
+        return 'Elementalist';
       case VisionaryClass.mossborn:
-        return 'Mossborn';
+        return 'Ranger';
       case VisionaryClass.farseer:
-        return 'Farseer';
+        return 'Gunsmith';
       case VisionaryClass.realist:
-        return 'Realist';
+        return 'Traditionalist';
     }
   }
 }

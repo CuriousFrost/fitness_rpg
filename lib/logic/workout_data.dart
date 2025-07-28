@@ -5,6 +5,7 @@ import 'dart:convert';
 import '../models/visionary_class.dart';
 import '../models/workout_entry.dart';
 import 'package:flutter/foundation.dart';
+import '../models/visionary_data.dart';
 
 
 
@@ -13,30 +14,23 @@ import 'package:flutter/foundation.dart';
 const int maxXpTotal = 152960; // Is this a per-character max, or overall?
 // If per-character, VisionaryData should probably know about it too.
 
-class WorkoutData with ChangeNotifier { // Mixin ChangeNotifier
+class WorkoutData with ChangeNotifier {
   final List<WorkoutEntry> _entries = [];
   final Map<VisionaryClass, int> _characterXp = {
     for (var c in VisionaryClass.values) c: 0,
   };
 
-  List<WorkoutEntry> get entries => List.unmodifiable(_entries); // Good practice
-  Map<VisionaryClass, int> get characterXp => Map.unmodifiable(_characterXp);
+  List<WorkoutEntry> get entries => List.unmodifiable(_entries);
+  Map<VisionaryClass, int> get characterXp => Map.unmodifiable(_characterXp); // This is our source of total XP
 
   void addWorkout(WorkoutEntry entry) {
     _entries.add(entry);
-    _characterXp[entry.visionary] = (_characterXp[entry.visionary] ?? 0) + entry.xp;
+    _characterXp[entry.visionary] =
+        ((_characterXp[entry.visionary] ?? 0) + entry.xp)
+            .clamp(0, VisionaryData.maxXpTotal); // Clamp using VisionaryData's max
 
-    // --- VisionaryData.addXpAndLevelUp IS NO LONGER CALLED HERE ---
-    // --- VisionaryData.save() IS NO LONGER CALLED HERE ---
-
-    if (_characterXp[entry.visionary]! > maxXpTotal) {
-      _characterXp[entry.visionary] = maxXpTotal;
-    }
-
-    save(); // Saves WorkoutData's state (_entries and _characterXp)
-    notifyListeners(); // <--- Notify listeners
-
-
+    save();
+    notifyListeners();
     print("WorkoutData: Added workout for ${entry.visionary.name}, Entry XP: ${entry.xp}");
     print("WorkoutData: Total XP in _characterXp for ${entry.visionary.name}: ${_characterXp[entry.visionary]}");
   }
@@ -46,16 +40,19 @@ class WorkoutData with ChangeNotifier { // Mixin ChangeNotifier
     if (index != -1) {
       // Adjust WorkoutData's total XP for the old entry
       _characterXp[oldEntry.visionary] =
-          ((_characterXp[oldEntry.visionary] ?? 0) - oldEntry.xp)
-              .clamp(0, maxXpTotal); // Clamp to 0 and its own max
+      ((_characterXp[oldEntry.visionary] ?? 0) - oldEntry.xp);
+
       _entries[index] = newEntry; // Replace the entry
 
       // Add XP for the new entry to WorkoutData's total
       _characterXp[newEntry.visionary] =
           ((_characterXp[newEntry.visionary] ?? 0) + newEntry.xp)
-              .clamp(0, maxXpTotal);
+              .clamp(0, VisionaryData.maxXpTotal);
+
       save();
       notifyListeners();
+      print("WorkoutData: Updated workout. Old XP: ${oldEntry.xp}, New XP: ${newEntry.xp} for ${newEntry.visionary.name}");
+      print("WorkoutData: Total XP in _characterXp for ${newEntry.visionary.name}: ${_characterXp[newEntry.visionary]}");
     }
   }
 
@@ -63,8 +60,8 @@ class WorkoutData with ChangeNotifier { // Mixin ChangeNotifier
     _entries.remove(entry);
     _characterXp[entry.visionary] =
         ((_characterXp[entry.visionary] ?? 0) - entry.xp)
-            .clamp(0, maxXpTotal); // maxXpTotal for _characterXp
-    // VisionaryData.removeXpAndAdjustLevel IS CALLED EXTERNALLY BEFORE THIS
+            .clamp(0, VisionaryData.maxXpTotal);
+
     save();
     notifyListeners();
     print("WorkoutData: Deleted workout for ${entry.visionary.name}. XP removed: ${entry.xp}");
