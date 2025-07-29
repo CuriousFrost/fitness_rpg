@@ -74,6 +74,17 @@ flutter:
     - assets/images/main_menu_background_option_4.png
     - assets/images/Visionaries of Sol.png
     - assets/text/visionary_descriptions.json
+    - assets/images/game/player/bloodletter_sprite_sheet.png
+    - assets/images/game/player/airsnatcher_sprite_sheet.png
+    - assets/images/game/player/saboteur_sprite_sheet.png
+    - assets/images/game/player/victimizer_sprite_sheet.png
+    - assets/images/game/player/light_theologist_sprite_sheet.png
+    - assets/images/game/player/symbolist_sprite_sheet.png
+    - assets/images/game/player/cosmologist_sprite_sheet.png
+    - assets/images/game/player/mossborn_sprite_sheet.png
+    - assets/images/game/player/farseer_sprite_sheet.png
+    - assets/images/game/player/realist_sprite_sheet.png
+
   fonts:
     - family: Kadera
       fonts:

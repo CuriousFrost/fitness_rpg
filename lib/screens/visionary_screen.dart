@@ -4,19 +4,15 @@ import 'package:flutter/material.dart';
 import '../logic/visionary_data.dart';
 import '../screens/visionary_combat_stats_screen.dart';
 import '../models/visionary_class.dart';
-import '../logic/workout_data.dart'; // Import WorkoutData
+import '../logic/workout_data.dart';
+import '../widgets/sprite_display_widget.dart';
 
 class VisionaryScreen extends StatelessWidget {
   const VisionaryScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // Assuming workoutData is available via Provider or as a global instance
-    // If global: final wd = workoutData;
-    // If Provider: final wd = Provider.of<WorkoutData>(context);
-    // For simplicity, let's use the global instance workoutData directly here.
-    // It's better to use Provider for cleaner dependency management.
-
+    const double displaySize = 60.0;
     final visionaries = VisionaryData.predefinedVisionaries;
 
     return Scaffold(
@@ -47,7 +43,19 @@ class VisionaryScreen extends StatelessWidget {
             margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             elevation: 4,
             child: ListTile(
-              leading: CircleAvatar(/* ... */),
+              leading: CircleAvatar(
+                radius: displaySize / 2,
+                backgroundColor: Colors.transparent,
+                child: ClipOval(
+                    child: SpriteDisplay(
+                      imagePath: visionaryDef.spriteSheetPath,
+                      spriteRect: visionaryDef.avatarSpriteRect,
+                      width: displaySize,
+                      height: displaySize,
+                      spriteScale: 1, // <<< EXAMPLE: Draw sprite at 75% of the circle's area
+                    ),
+                ),
+              ),
               title: Text(visionaryDef.displayName),
               subtitle: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

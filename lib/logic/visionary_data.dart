@@ -4,6 +4,8 @@ import 'dart:math';
 import '../models/visionary_class.dart';
 import '../models/combat_stats.dart'; // Ensure this is correctly imported
 import 'package:flutter/services.dart' show rootBundle;
+import 'package:flutter/painting.dart';
+
 
 class VisionaryData {
   // ------------------------------------------------------------------
@@ -15,6 +17,8 @@ class VisionaryData {
   final String classType; // Or VisionaryClass
   final String weaponType;
   final CombatStats combatStats; // This needs CombatStats to be defined
+  final String spriteSheetPath;
+  final Rect avatarSpriteRect;
 
   VisionaryData({
     required this.id,
@@ -23,6 +27,8 @@ class VisionaryData {
     required this.classType,
     required this.weaponType,
     required this.combatStats,
+    required this.spriteSheetPath,
+    required this.avatarSpriteRect,
   });
 
   // ------------------------------------------------------------------
@@ -96,11 +102,12 @@ class VisionaryData {
   }
 
   static Future<void> save() async {}
-
   static Future<void> load() async {}
+
   static Map<String, String> _loadedDescriptions = {};
   static late final List<VisionaryData> predefinedVisionaries;
-  static final bool _isInitialized = false;
+  static bool _isInitialized = false;
+
   static Future<void> initialize() async {
     if (_isInitialized) return; // Prevent re-initialization
 
@@ -121,33 +128,32 @@ class VisionaryData {
     predefinedVisionaries = [
       VisionaryData(
         id: 'bloodletter',
-        // Unique ID for this visionary type
         displayName: 'Bloodletter',
         description:
             _loadedDescriptions['bloodletter_description'] ??
             'Default description',
         classType: VisionaryClass.bloodletter.name,
-        // Storing the class name as a string
         weaponType: 'Sword',
         // Retrieve stats from combatStatsMap, provide a fallback if not found
         combatStats:
             combatStatsMap[VisionaryClass.bloodletter] ??
             CombatStats(atk: 1, def: 1, spd: 1, hp: 10),
+        spriteSheetPath: 'assets/images/game/player/bloodletter_sprite_sheet.png',
+        avatarSpriteRect: Rect.fromLTWH(35, 25, 250, 250),
       ),
       VisionaryData(
         id: 'airsnatcher',
-        // Unique ID for this visionary type
         displayName: 'Airsnatcher',
         description:
             _loadedDescriptions['airsnatcher_description'] ??
             'Default description',
         classType: VisionaryClass.airsnatcher.name,
-        // Storing the class name as a string
         weaponType: 'Particle Matter',
-        // Retrieve stats from combatStatsMap, provide a fallback if not found
         combatStats:
             combatStatsMap[VisionaryClass.airsnatcher] ??
             CombatStats(atk: 1, def: 1, spd: 1, hp: 10),
+        spriteSheetPath: 'assets/images/game/player/airsnatcher_sprite_sheet.png',
+        avatarSpriteRect: Rect.fromLTWH(35, 25, 250, 250),
       ),
       VisionaryData(
         id: 'saboteur',
@@ -160,6 +166,8 @@ class VisionaryData {
         combatStats:
             combatStatsMap[VisionaryClass.saboteur] ??
             CombatStats(atk: 1, def: 1, spd: 1, hp: 10),
+        spriteSheetPath: 'assets/images/game/player/saboteur_sprite_sheet.png',
+        avatarSpriteRect: Rect.fromLTWH(35, 25, 250, 250),
       ),
       VisionaryData(
         id: 'light_theologist',
@@ -172,6 +180,8 @@ class VisionaryData {
         combatStats:
             combatStatsMap[VisionaryClass.lightTheologist] ??
             CombatStats(atk: 1, def: 1, spd: 1, hp: 10),
+        spriteSheetPath: 'assets/images/game/player/light_theologist_sprite_sheet.png',
+        avatarSpriteRect: Rect.fromLTWH(35, 25, 250, 250),
       ),
       VisionaryData(
         id: 'victimizer',
@@ -184,6 +194,8 @@ class VisionaryData {
         combatStats:
             combatStatsMap[VisionaryClass.victimizer] ??
             CombatStats(atk: 1, def: 1, spd: 1, hp: 10),
+        spriteSheetPath: 'assets/images/game/player/victimizer_sprite_sheet.png',
+        avatarSpriteRect: Rect.fromLTWH(35, 25, 250, 250),
       ),
       VisionaryData(
         id: 'symbolist',
@@ -196,6 +208,8 @@ class VisionaryData {
         combatStats:
             combatStatsMap[VisionaryClass.symbolist] ??
             CombatStats(atk: 1, def: 1, spd: 1, hp: 10),
+        spriteSheetPath: 'assets/images/game/player/symbolist_sprite_sheet.png',
+        avatarSpriteRect: Rect.fromLTWH(35, 25, 250, 250),
       ),
       VisionaryData(
         id: 'cosmologist',
@@ -208,6 +222,8 @@ class VisionaryData {
         combatStats:
             combatStatsMap[VisionaryClass.cosmologist] ??
             CombatStats(atk: 1, def: 1, spd: 1, hp: 10),
+        spriteSheetPath: 'assets/images/game/player/cosmologist_sprite_sheet.png',
+        avatarSpriteRect: Rect.fromLTWH(35, 25, 250, 250),
       ),
       VisionaryData(
         id: 'mossborn',
@@ -220,6 +236,8 @@ class VisionaryData {
         combatStats:
             combatStatsMap[VisionaryClass.mossborn] ??
             CombatStats(atk: 1, def: 1, spd: 1, hp: 10),
+        spriteSheetPath: 'assets/images/game/player/mossborn_sprite_sheet.png',
+        avatarSpriteRect: Rect.fromLTWH(35, 25, 250, 250),
       ),
       VisionaryData(
         id: 'farseer',
@@ -231,6 +249,8 @@ class VisionaryData {
         combatStats:
             combatStatsMap[VisionaryClass.farseer] ??
             CombatStats(atk: 1, def: 1, spd: 1, hp: 10),
+        spriteSheetPath: 'assets/images/game/player/farseer_sprite_sheet.png',
+        avatarSpriteRect: Rect.fromLTWH(35, 25, 250, 250),
       ),
       VisionaryData(
         id: 'realist',
@@ -242,7 +262,10 @@ class VisionaryData {
         combatStats:
             combatStatsMap[VisionaryClass.realist] ??
             CombatStats(atk: 1, def: 1, spd: 1, hp: 10),
+        spriteSheetPath: 'assets/images/game/player/realist_sprite_sheet.png',
+        avatarSpriteRect: Rect.fromLTWH(35, 25, 250, 250),
       ),
     ];
+    _isInitialized = true;
   }
 }
