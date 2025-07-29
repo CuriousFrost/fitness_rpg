@@ -120,7 +120,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 // --- Create the new WorkoutEntry ---
                 // IMPORTANT: Decide if you want to update the timestamp or keep the original.
                 // Using entry.timestamp keeps the original workout time. DateTime.now() updates it.
-                final WorkoutEntry originalEntry = entry; // The entry being edited
+                final WorkoutEntry originalEntry =
+                    entry; // The entry being edited
 
                 final updatedEntry = WorkoutEntry(
                   visionary: originalEntry.visionary,
@@ -130,7 +131,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   timestamp: originalEntry.timestamp, // Or DateTime.now()
                   distance: newDistance,
                 );
-
 
                 // --- Update WorkoutData (which handles its own _characterXp) ---
                 // 'actualIndex' was passed as 'index' to showEditWorkoutDialog,
@@ -282,7 +282,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
                                   false;
 
                               if (confirmed) {
-                                final entryToDelete = entry; // 'entry' from the ListView.builder
+                                final entryToDelete =
+                                    entry; // 'entry' from the ListView.builder
 
                                 // This single call updates _entries and _characterXp in WorkoutData
                                 // and notifies listeners.

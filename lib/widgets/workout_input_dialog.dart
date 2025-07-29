@@ -12,13 +12,15 @@ Widget build(BuildContext context) {
 }
 
 Future<void> showEditWorkoutDialog(
-    BuildContext context,
-    WorkoutEntry entry,
-    VoidCallback onSave,
-    ) async {
+  BuildContext context,
+  WorkoutEntry entry,
+  VoidCallback onSave,
+) async {
   final descController = TextEditingController(text: entry.description);
   final xpController = TextEditingController(text: entry.xp.toString());
-  final distanceController = TextEditingController(text: entry.distance.toString());
+  final distanceController = TextEditingController(
+    text: entry.distance.toString(),
+  );
 
   await showDialog(
     context: context,
@@ -70,9 +72,14 @@ Future<void> showEditWorkoutDialog(
 }
 
 class WorkoutInputDialog extends StatefulWidget {
-  final void Function(WorkoutType, String, int, {double? distance}) onWorkoutLogged;
+  final void Function(WorkoutType, String, int, {double? distance})
+  onWorkoutLogged;
   final WorkoutEntry? entry;
-  const WorkoutInputDialog({super.key, required this.onWorkoutLogged, this.entry});
+  const WorkoutInputDialog({
+    super.key,
+    required this.onWorkoutLogged,
+    this.entry,
+  });
 
   @override
   State<WorkoutInputDialog> createState() => _WorkoutInputDialogState();
@@ -160,12 +167,7 @@ class _WorkoutInputDialogState extends State<WorkoutInputDialog> {
       distance = primary;
     }
 
-    widget.onWorkoutLogged(
-      selectedWorkout!,
-      desc,
-      xp,
-      distance: distance,
-    );
+    widget.onWorkoutLogged(selectedWorkout!, desc, xp, distance: distance);
 
     Navigator.of(context).pop();
   }

@@ -18,7 +18,12 @@ final Map<VisionaryClass, CombatStats> combatStatsMap = {
   VisionaryClass.bloodletter: CombatStats(hp: 30, atk: 10, def: 25, spd: 15),
   VisionaryClass.airsnatcher: CombatStats(hp: 20, atk: 30, def: 10, spd: 10),
   VisionaryClass.saboteur: CombatStats(hp: 15, atk: 27, def: 10, spd: 22),
-  VisionaryClass.lightTheologist: CombatStats(hp: 20, atk: 20, def: 20, spd: 20),
+  VisionaryClass.lightTheologist: CombatStats(
+    hp: 20,
+    atk: 20,
+    def: 20,
+    spd: 20,
+  ),
   VisionaryClass.victimizer: CombatStats(hp: 35, atk: 10, def: 27, spd: 8),
   VisionaryClass.symbolist: CombatStats(hp: 20, atk: 22, def: 20, spd: 12),
   VisionaryClass.cosmologist: CombatStats(hp: 15, atk: 32, def: 10, spd: 13),

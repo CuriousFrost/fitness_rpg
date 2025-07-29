@@ -20,7 +20,6 @@ class MainMenuScreen extends StatelessWidget {
 
           // Menu buttons aligned in the target area
           Column(
-
             mainAxisAlignment: MainAxisAlignment.center,
 
             children: [

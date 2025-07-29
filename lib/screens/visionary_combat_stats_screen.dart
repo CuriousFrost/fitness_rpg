@@ -6,8 +6,10 @@ import './visionary_stats_screen.dart';
 
 class VisionaryCombatStatsScreen extends StatelessWidget {
   final VisionaryData visionaryData; // Changed from individual fields
-  final CombatStats currentDisplayStats; // Potentially modified stats for display
-  final String visionaryName; // Can still be useful for title, or get from visionaryData
+  final CombatStats
+  currentDisplayStats; // Potentially modified stats for display
+  final String
+  visionaryName; // Can still be useful for title, or get from visionaryData
   final int level;
   final int xp;
   final int xpToNextLevel;
@@ -32,8 +34,9 @@ class VisionaryCombatStatsScreen extends StatelessWidget {
     final CombatStats baseCombatStats = visionaryData.combatStats;
     final String description = visionaryData.description;
     final String weaponType = visionaryData.weaponType;
-    final VisionaryClass classEnum = VisionaryClass.fromString(visionaryData.classType);
-
+    final VisionaryClass classEnum = VisionaryClass.fromString(
+      visionaryData.classType,
+    );
 
     return Scaffold(
       appBar: AppBar(
@@ -47,7 +50,8 @@ class VisionaryCombatStatsScreen extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                   builder: (context) => VisionaryStatsScreen(
-                    visionary: visionaryData, // Pass the full VisionaryData object
+                    visionary:
+                        visionaryData, // Pass the full VisionaryData object
                   ),
                 ),
               );
@@ -60,30 +64,54 @@ class VisionaryCombatStatsScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              description,
-              style: const TextStyle(fontSize: 16),
-            ),
+            Text(description, style: const TextStyle(fontSize: 16)),
             const SizedBox(height: 20),
-            Text('Level: $level, XP: $xp / $xpToNextLevel (${(xpProgress * 100).toStringAsFixed(1)}%)'),
+            Text(
+              'Level: $level, XP: $xp / $xpToNextLevel (${(xpProgress * 100).toStringAsFixed(1)}%)',
+            ),
             const SizedBox(height: 10),
             Wrap(
               spacing: 16,
               runSpacing: 16,
               children: [
                 // Use currentDisplayStats for what's shown, baseCombatStats if you want to show base
-                _buildStatTile(context, 'HP', currentDisplayStats.hp.toString()),
-                _buildStatTile(context, 'ATK', currentDisplayStats.atk.toString()),
-                _buildStatTile(context, 'DEF', currentDisplayStats.def.toString()),
-                _buildStatTile(context, 'SPD', currentDisplayStats.spd.toString()),
+                _buildStatTile(
+                  context,
+                  'HP',
+                  currentDisplayStats.hp.toString(),
+                ),
+                _buildStatTile(
+                  context,
+                  'ATK',
+                  currentDisplayStats.atk.toString(),
+                ),
+                _buildStatTile(
+                  context,
+                  'DEF',
+                  currentDisplayStats.def.toString(),
+                ),
+                _buildStatTile(
+                  context,
+                  'SPD',
+                  currentDisplayStats.spd.toString(),
+                ),
               ],
             ),
             const SizedBox(height: 24),
             Row(
               children: [
-                _buildAttributeTag(context, 'Class: ${classEnum.displayName}'), // Use displayName from enum
+                _buildAttributeTag(
+                  // This is the tag for the Class Type
+                  context,
+                  'Class: ${classEnum.displayName}',
+                  classTypeForColor:
+                      classEnum, // <<< THIS IS CRUCIAL: Pass the enum here
+                ),
                 const SizedBox(width: 12),
-                _buildAttributeTag(context, 'Weapon: $weaponType'),
+                _buildAttributeTag(
+                  context,
+                  'Weapon: ${visionaryData.weaponType}',
+                ), // Weapon tag, no color specified
               ],
             ),
           ],
@@ -133,11 +161,29 @@ class VisionaryCombatStatsScreen extends StatelessWidget {
   }
 
   // Updated to accept BuildContext
-  Widget _buildAttributeTag(BuildContext context, String text) {
+  Widget _buildAttributeTag(
+    BuildContext context,
+    String text, {
+    VisionaryClass? classTypeForColor,
+  }) {
+    // Parameter name is important
+    Color backgroundColor;
+    Color textColor;
+
+    if (classTypeForColor != null) {
+      // THIS IS THE CRUCIAL PART FOR USING THE ENUM'S COLORS
+      backgroundColor = classTypeForColor.classColor;
+      textColor = classTypeForColor.classTextColor;
+    } else {
+      // Fallback for tags that aren't class-specific (like weapon type)
+      backgroundColor = Theme.of(context).colorScheme.tertiaryContainer;
+      textColor = Theme.of(context).colorScheme.onTertiaryContainer;
+    }
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.tertiaryContainer,
+        color: backgroundColor, // Background color is applied here
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(
@@ -145,7 +191,7 @@ class VisionaryCombatStatsScreen extends StatelessWidget {
         style: TextStyle(
           fontSize: 14,
           fontWeight: FontWeight.w500,
-          color: Theme.of(context).colorScheme.onTertiaryContainer,
+          color: textColor, // Text color is applied here
         ),
       ),
     );

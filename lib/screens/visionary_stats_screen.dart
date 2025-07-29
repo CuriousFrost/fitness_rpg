@@ -8,7 +8,6 @@ import 'package:fl_chart/fl_chart.dart';
 import '../logic/workout_data.dart';
 import '../models/visionary_class.dart';
 
-
 extension WorkoutTypeIcon on WorkoutType {
   IconData get icon {
     switch (this) {
@@ -54,13 +53,25 @@ class _VisionaryStatsScreenState extends State<VisionaryStatsScreen> {
     _calculateStatsAndUpdateUI();
     workoutData.addListener(_onWorkoutDataChanged);
     final now = DateTime.now();
-    final weekStart = now.subtract(Duration(days: now.weekday - 1)).copyWith(hour: 5);
+    final weekStart = now
+        .subtract(Duration(days: now.weekday - 1))
+        .copyWith(hour: 5);
     final weekEnd = weekStart.add(const Duration(days: 6));
 
     String formatDate(DateTime date) {
       const months = [
-        'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+        'Jan',
+        'Feb',
+        'Mar',
+        'Apr',
+        'May',
+        'Jun',
+        'Jul',
+        'Aug',
+        'Sep',
+        'Oct',
+        'Nov',
+        'Dec',
       ];
       return '${months[date.month - 1]} ${date.day}';
     }
@@ -70,8 +81,8 @@ class _VisionaryStatsScreenState extends State<VisionaryStatsScreen> {
         : '${formatDate(weekStart)} - ${formatDate(weekEnd)}';
 
     _calculateStatsAndUpdateUI();
-
   }
+
   @override
   void dispose() {
     // ALWAYS remove listeners in dispose
@@ -81,14 +92,17 @@ class _VisionaryStatsScreenState extends State<VisionaryStatsScreen> {
 
   void _onWorkoutDataChanged() {
     // When workoutData notifies of a change, recalculate and rebuild
-    print("VisionaryStatsScreen: Detected change in workoutData, recalculating stats.");
+    print(
+      "VisionaryStatsScreen: Detected change in workoutData, recalculating stats.",
+    );
     _calculateStatsAndUpdateUI();
   }
 
   // New method to combine calculation and UI update
   void _calculateStatsAndUpdateUI() {
     _calculateStats(); // Your existing calculation logic
-    if (mounted) { // Ensure the widget is still in the tree
+    if (mounted) {
+      // Ensure the widget is still in the tree
       setState(() {}); // Trigger a rebuild
     }
   }
@@ -98,9 +112,17 @@ class _VisionaryStatsScreenState extends State<VisionaryStatsScreen> {
     // Ensure weekStart is midnight at the beginning of Monday
     final weekStart = now
         .subtract(Duration(days: now.weekday - 1))
-        .copyWith(hour: 0, minute: 0, second: 0, millisecond: 0, microsecond: 0);
+        .copyWith(
+          hour: 0,
+          minute: 0,
+          second: 0,
+          millisecond: 0,
+          microsecond: 0,
+        );
 
-    final VisionaryClass visionaryEnumForScreen = VisionaryClass.fromString(widget.visionary.classType);
+    final VisionaryClass visionaryEnumForScreen = VisionaryClass.fromString(
+      widget.visionary.classType,
+    );
 
     entries = workoutData.entries
         .where((e) => e.visionary == visionaryEnumForScreen)
@@ -108,12 +130,19 @@ class _VisionaryStatsScreenState extends State<VisionaryStatsScreen> {
 
     xpByType = {};
     // Initialize distanceByType for all relevant types, not just cardio if you want to display them
-    distanceByType = { for (var type in WorkoutType.values) type: 0.0 };
-
+    distanceByType = {for (var type in WorkoutType.values) type: 0.0};
 
     // Initialize xpPerDay for the 7 days of the week, ensuring order
-    final List<String> weekDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-    final Map<String, int> xpPerDay = { for (var day in weekDays) day: 0 };
+    final List<String> weekDays = [
+      'Mon',
+      'Tue',
+      'Wed',
+      'Thu',
+      'Fri',
+      'Sat',
+      'Sun',
+    ];
+    final Map<String, int> xpPerDay = {for (var day in weekDays) day: 0};
 
     for (var e in entries) {
       xpByType[e.type] = (xpByType[e.type] ?? 0) + e.xp;
@@ -130,7 +159,8 @@ class _VisionaryStatsScreenState extends State<VisionaryStatsScreen> {
       // Check if the entry's timestamp is within the current week
       if (!e.timestamp.isBefore(weekStart) &&
           e.timestamp.isBefore(weekStart.add(const Duration(days: 7)))) {
-        final dayString = weekDays[e.timestamp.weekday - 1]; // Monday is 1 -> index 0
+        final dayString =
+            weekDays[e.timestamp.weekday - 1]; // Monday is 1 -> index 0
         xpPerDay[dayString] = (xpPerDay[dayString] ?? 0) + e.xp;
       }
     }
@@ -138,7 +168,9 @@ class _VisionaryStatsScreenState extends State<VisionaryStatsScreen> {
     // Create FlSpots in the correct Monday-Sunday order
     xpSpots = [];
     for (int i = 0; i < weekDays.length; i++) {
-      xpSpots.add(FlSpot(i.toDouble(), (xpPerDay[weekDays[i]] ?? 0).toDouble()));
+      xpSpots.add(
+        FlSpot(i.toDouble(), (xpPerDay[weekDays[i]] ?? 0).toDouble()),
+      );
     }
     // Update dateRange string here as well if it might change,
     // though for "current week" it's fine in initState.
@@ -150,7 +182,6 @@ class _VisionaryStatsScreenState extends State<VisionaryStatsScreen> {
   String _getDayString(int dayIndex) {
     return ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][dayIndex];
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -299,7 +330,10 @@ class _VisionaryStatsScreenState extends State<VisionaryStatsScreen> {
                             if (value % 100 == 0 && value <= 700) {
                               return Text(
                                 value.toInt().toString(),
-                                style: const TextStyle(color: Colors.white, fontSize: 10),
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 10,
+                                ),
                               );
                             }
                             return const SizedBox.shrink();

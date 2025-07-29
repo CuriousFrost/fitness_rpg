@@ -44,6 +44,7 @@ class VisionaryData {
     return (baseXpForLevelUp * (pow(levelXpMultiplier, currentLevel - 1)))
         .round();
   }
+
   /// Calculates the current level, XP into that level, and XP needed for the next level
   /// based on the total historical XP accumulated for a visionary.
   static Map<String, int> calculateLevelAndProgress(int totalHistoricalXp) {
@@ -58,10 +59,12 @@ class VisionaryData {
 
     while (currentLevel < maxLevel) {
       int xpNeededForThisLevel = xpToNextLevel(currentLevel);
-      if (xpNeededForThisLevel == 0) { // Should only happen if currentLevel is already maxLevel
+      if (xpNeededForThisLevel == 0) {
+        // Should only happen if currentLevel is already maxLevel
         break;
       }
-      if (cappedHistoricalXp >= accumulatedXpForPriorLevels + xpNeededForThisLevel) {
+      if (cappedHistoricalXp >=
+          accumulatedXpForPriorLevels + xpNeededForThisLevel) {
         accumulatedXpForPriorLevels += xpNeededForThisLevel;
         currentLevel++;
       } else {
@@ -73,19 +76,23 @@ class VisionaryData {
 
     // If at max level, ensure xpIntoCurrentLevel doesn't exceed what's needed for the final bar
     if (currentLevel == maxLevel) {
-      int xpForMaxLevelBar = xpToNextLevel(maxLevel -1); // XP to complete level before max
+      int xpForMaxLevelBar = xpToNextLevel(
+        maxLevel - 1,
+      ); // XP to complete level before max
       if (xpForMaxLevelBar > 0) {
         xpIntoCurrentLevel = xpIntoCurrentLevel.clamp(0, xpForMaxLevelBar);
-      } else { // If maxLevel is 1, or xpToNextLevel(maxLevel-1) is 0 for some reason
+      } else {
+        // If maxLevel is 1, or xpToNextLevel(maxLevel-1) is 0 for some reason
         xpIntoCurrentLevel = 0;
       }
     }
 
-
     return {
       'level': currentLevel,
       'xpIntoCurrentLevel': xpIntoCurrentLevel,
-      'xpNeededForNextLevel': xpToNextLevel(currentLevel), // XP needed to complete the currentLevel
+      'xpNeededForNextLevel': xpToNextLevel(
+        currentLevel,
+      ), // XP needed to complete the currentLevel
     };
   }
 
@@ -95,7 +102,9 @@ class VisionaryData {
     // final levelJson = jsonEncode(classLevel.map((k, v) => MapEntry(k.name, v))); // REMOVE
     // await prefs.setString('classXp', xpJson); // REMOVE
     // await prefs.setString('classLevel', levelJson); // REMOVE
-    print("VisionaryData.save() called - no classXp/classLevel to save anymore.");
+    print(
+      "VisionaryData.save() called - no classXp/classLevel to save anymore.",
+    );
   }
 
   static Future<void> load() async {
@@ -105,7 +114,9 @@ class VisionaryData {
     // if (xpJson != null && levelJson != null) { // REMOVE THIS BLOCK
     //   ...
     // }
-    print("VisionaryData.load() called - no classXp/classLevel to load anymore.");
+    print(
+      "VisionaryData.load() called - no classXp/classLevel to load anymore.",
+    );
     // Ensure VisionaryClass values are still available if needed by other logic during load
     // for (var c in VisionaryClass.values) {
     //   // No longer initializing classXp[c] or classLevel[c] here

@@ -2,7 +2,6 @@
 import 'package:flutter/material.dart';
 import '../models/visionary_data.dart';
 
-
 // No longer need 'dart:math' here if formulas are external
 class XPProgressBar extends StatelessWidget {
   final int currentLevel;
@@ -18,15 +17,22 @@ class XPProgressBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final int safeXpIntoLevel = xpIntoCurrentLevel.clamp(0, xpNeededForNextLevel);
+    final int safeXpIntoLevel = xpIntoCurrentLevel.clamp(
+      0,
+      xpNeededForNextLevel,
+    );
     final double progress = (xpNeededForNextLevel > 0)
         ? (safeXpIntoLevel / xpNeededForNextLevel).clamp(0.0, 1.0)
-        : (currentLevel >= VisionaryData.maxLevel ? 1.0 : 0.0); // Show full if max level
+        : (currentLevel >= VisionaryData.maxLevel
+              ? 1.0
+              : 0.0); // Show full if max level
 
-    final String xpText = (xpNeededForNextLevel > 0 && currentLevel < VisionaryData.maxLevel)
+    final String xpText =
+        (xpNeededForNextLevel > 0 && currentLevel < VisionaryData.maxLevel)
         ? '$safeXpIntoLevel / $xpNeededForNextLevel XP'
-        : (currentLevel >= VisionaryData.maxLevel ? "Max Level" : "$safeXpIntoLevel / $xpNeededForNextLevel XP");
-
+        : (currentLevel >= VisionaryData.maxLevel
+              ? "Max Level"
+              : "$safeXpIntoLevel / $xpNeededForNextLevel XP");
 
     return Column(
       // ... same layout as before using these parameters ...

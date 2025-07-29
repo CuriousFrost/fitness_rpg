@@ -7,9 +7,6 @@ import '../models/workout_entry.dart';
 import 'package:flutter/foundation.dart';
 import '../models/visionary_data.dart';
 
-
-
-
 // Updated workout_data.dart
 const int maxXpTotal = 152960; // Is this a per-character max, or overall?
 // If per-character, VisionaryData should probably know about it too.
@@ -21,18 +18,25 @@ class WorkoutData with ChangeNotifier {
   };
 
   List<WorkoutEntry> get entries => List.unmodifiable(_entries);
-  Map<VisionaryClass, int> get characterXp => Map.unmodifiable(_characterXp); // This is our source of total XP
+  Map<VisionaryClass, int> get characterXp =>
+      Map.unmodifiable(_characterXp); // This is our source of total XP
 
   void addWorkout(WorkoutEntry entry) {
     _entries.add(entry);
     _characterXp[entry.visionary] =
-        ((_characterXp[entry.visionary] ?? 0) + entry.xp)
-            .clamp(0, VisionaryData.maxXpTotal); // Clamp using VisionaryData's max
+        ((_characterXp[entry.visionary] ?? 0) + entry.xp).clamp(
+          0,
+          VisionaryData.maxXpTotal,
+        ); // Clamp using VisionaryData's max
 
     save();
     notifyListeners();
-    print("WorkoutData: Added workout for ${entry.visionary.name}, Entry XP: ${entry.xp}");
-    print("WorkoutData: Total XP in _characterXp for ${entry.visionary.name}: ${_characterXp[entry.visionary]}");
+    print(
+      "WorkoutData: Added workout for ${entry.visionary.name}, Entry XP: ${entry.xp}",
+    );
+    print(
+      "WorkoutData: Total XP in _characterXp for ${entry.visionary.name}: ${_characterXp[entry.visionary]}",
+    );
   }
 
   void updateWorkout(WorkoutEntry oldEntry, WorkoutEntry newEntry) {
@@ -40,32 +44,44 @@ class WorkoutData with ChangeNotifier {
     if (index != -1) {
       // Adjust WorkoutData's total XP for the old entry
       _characterXp[oldEntry.visionary] =
-      ((_characterXp[oldEntry.visionary] ?? 0) - oldEntry.xp);
+          ((_characterXp[oldEntry.visionary] ?? 0) - oldEntry.xp);
 
       _entries[index] = newEntry; // Replace the entry
 
       // Add XP for the new entry to WorkoutData's total
       _characterXp[newEntry.visionary] =
-          ((_characterXp[newEntry.visionary] ?? 0) + newEntry.xp)
-              .clamp(0, VisionaryData.maxXpTotal);
+          ((_characterXp[newEntry.visionary] ?? 0) + newEntry.xp).clamp(
+            0,
+            VisionaryData.maxXpTotal,
+          );
 
       save();
       notifyListeners();
-      print("WorkoutData: Updated workout. Old XP: ${oldEntry.xp}, New XP: ${newEntry.xp} for ${newEntry.visionary.name}");
-      print("WorkoutData: Total XP in _characterXp for ${newEntry.visionary.name}: ${_characterXp[newEntry.visionary]}");
+      print(
+        "WorkoutData: Updated workout. Old XP: ${oldEntry.xp}, New XP: ${newEntry.xp} for ${newEntry.visionary.name}",
+      );
+      print(
+        "WorkoutData: Total XP in _characterXp for ${newEntry.visionary.name}: ${_characterXp[newEntry.visionary]}",
+      );
     }
   }
 
   void deleteWorkout(WorkoutEntry entry) {
     _entries.remove(entry);
     _characterXp[entry.visionary] =
-        ((_characterXp[entry.visionary] ?? 0) - entry.xp)
-            .clamp(0, VisionaryData.maxXpTotal);
+        ((_characterXp[entry.visionary] ?? 0) - entry.xp).clamp(
+          0,
+          VisionaryData.maxXpTotal,
+        );
 
     save();
     notifyListeners();
-    print("WorkoutData: Deleted workout for ${entry.visionary.name}. XP removed: ${entry.xp}");
-    print("WorkoutData: Total XP in _characterXp for ${entry.visionary.name}: ${_characterXp[entry.visionary]}");
+    print(
+      "WorkoutData: Deleted workout for ${entry.visionary.name}. XP removed: ${entry.xp}",
+    );
+    print(
+      "WorkoutData: Total XP in _characterXp for ${entry.visionary.name}: ${_characterXp[entry.visionary]}",
+    );
   }
 
   Future<void> save() async {
@@ -74,13 +90,21 @@ class WorkoutData with ChangeNotifier {
 
     // SAVING _entries
     if (_entries.isEmpty) {
-      print("WorkoutData SAVE: _entries is EMPTY. Saving an empty list representation.");
+      print(
+        "WorkoutData SAVE: _entries is EMPTY. Saving an empty list representation.",
+      );
     } else {
-      print("WorkoutData SAVE: _entries has ${_entries.length} items. First item desc: ${_entries.first.description}");
+      print(
+        "WorkoutData SAVE: _entries has ${_entries.length} items. First item desc: ${_entries.first.description}",
+      );
     }
-    final List<Map<String, dynamic>> entriesJsonList = _entries.map((e) => e.toJson()).toList();
+    final List<Map<String, dynamic>> entriesJsonList = _entries
+        .map((e) => e.toJson())
+        .toList();
     final String jsonString = jsonEncode(entriesJsonList);
-    print("WorkoutData SAVE: JSON string for 'workouts': $jsonString"); // Log the actual JSON
+    print(
+      "WorkoutData SAVE: JSON string for 'workouts': $jsonString",
+    ); // Log the actual JSON
 
     try {
       await prefs.setString('workouts', jsonString);
@@ -97,7 +121,9 @@ class WorkoutData with ChangeNotifier {
     }
     final xpMap = _characterXp.map((k, v) => MapEntry(k.name, v));
     final String characterXpJsonString = jsonEncode(xpMap);
-    print("WorkoutData SAVE: JSON string for 'characterXp': $characterXpJsonString");
+    print(
+      "WorkoutData SAVE: JSON string for 'characterXp': $characterXpJsonString",
+    );
 
     try {
       await prefs.setString('characterXp', characterXpJsonString);
@@ -118,47 +144,79 @@ class WorkoutData with ChangeNotifier {
 
     final String? jsonString = prefs.getString('workouts'); // Key: "workouts"
     if (jsonString == null) {
-      print("WorkoutData LOAD: No data found for key 'workouts' in SharedPreferences.");
+      print(
+        "WorkoutData LOAD: No data found for key 'workouts' in SharedPreferences.",
+      );
     } else if (jsonString.isEmpty || jsonString == "[]") {
-      print("WorkoutData LOAD: Found key 'workouts', but it's empty or an empty list string: '$jsonString'");
+      print(
+        "WorkoutData LOAD: Found key 'workouts', but it's empty or an empty list string: '$jsonString'",
+      );
     } else {
       print("WorkoutData LOAD: Found data for 'workouts': $jsonString");
       try {
-        final List<dynamic> decodedList = jsonDecode(jsonString); // Use List<dynamic>
-        print("WorkoutData LOAD: Successfully decoded 'workouts' JSON. Number of items in decoded list: ${decodedList.length}");
+        final List<dynamic> decodedList = jsonDecode(
+          jsonString,
+        ); // Use List<dynamic>
+        print(
+          "WorkoutData LOAD: Successfully decoded 'workouts' JSON. Number of items in decoded list: ${decodedList.length}",
+        );
 
         if (decodedList.isNotEmpty) {
-          print("WorkoutData LOAD: First item in decoded list (raw): ${decodedList.first}");
+          print(
+            "WorkoutData LOAD: First item in decoded list (raw): ${decodedList.first}",
+          );
         }
 
-        _entries.addAll(decodedList.map((e) {
-          try {
-            // Explicitly cast 'e' to Map<String, dynamic>
-            if (e is Map<String, dynamic>) {
-              print("WorkoutData LOAD: Attempting WorkoutEntry.fromJson for item: $e");
-              WorkoutEntry entry = WorkoutEntry.fromJson(e);
-              print("WorkoutData LOAD: Successfully created WorkoutEntry: ${entry.description}");
-              return entry;
-            } else {
-              print("WorkoutData LOAD: ERROR - Decoded item is not a Map<String, dynamic>: $e. Skipping.");
-              return null; // Will be filtered out by .where((entry) => entry != null)
-            }
-          } catch (ex) {
-            print("WorkoutData LOAD: ERROR in WorkoutEntry.fromJson for item $e: $ex");
-            return null; // Skip problematic entries
-          }
-        }).where((entry) => entry != null).cast<WorkoutEntry>().toList()); // Filter out nulls and cast
+        _entries.addAll(
+          decodedList
+              .map((e) {
+                try {
+                  // Explicitly cast 'e' to Map<String, dynamic>
+                  if (e is Map<String, dynamic>) {
+                    print(
+                      "WorkoutData LOAD: Attempting WorkoutEntry.fromJson for item: $e",
+                    );
+                    WorkoutEntry entry = WorkoutEntry.fromJson(e);
+                    print(
+                      "WorkoutData LOAD: Successfully created WorkoutEntry: ${entry.description}",
+                    );
+                    return entry;
+                  } else {
+                    print(
+                      "WorkoutData LOAD: ERROR - Decoded item is not a Map<String, dynamic>: $e. Skipping.",
+                    );
+                    return null; // Will be filtered out by .where((entry) => entry != null)
+                  }
+                } catch (ex) {
+                  print(
+                    "WorkoutData LOAD: ERROR in WorkoutEntry.fromJson for item $e: $ex",
+                  );
+                  return null; // Skip problematic entries
+                }
+              })
+              .where((entry) => entry != null)
+              .cast<WorkoutEntry>()
+              .toList(),
+        ); // Filter out nulls and cast
 
-        print("WorkoutData LOAD: After processing, _entries has ${_entries.length} items.");
+        print(
+          "WorkoutData LOAD: After processing, _entries has ${_entries.length} items.",
+        );
         if (_entries.isNotEmpty) {
-          print("WorkoutData LOAD: First loaded entry desc: ${_entries.first.description}");
+          print(
+            "WorkoutData LOAD: First loaded entry desc: ${_entries.first.description}",
+          );
         }
       } catch (e) {
-        print("WorkoutData LOAD: ERROR decoding 'workouts' JSON or processing entries: $e");
+        print(
+          "WorkoutData LOAD: ERROR decoding 'workouts' JSON or processing entries: $e",
+        );
         // _entries will remain empty or partially filled if decoding fails mid-way
       }
     }
-    print("WorkoutData LOAD: Finished loading _entries. Count: ${_entries.length}");
+    print(
+      "WorkoutData LOAD: Finished loading _entries. Count: ${_entries.length}",
+    );
 
     // --- LOADING _characterXp --- (Keep your existing try-catch and logging here too)
     _characterXp.clear();
@@ -172,7 +230,9 @@ class WorkoutData with ChangeNotifier {
       if (xpString == null) {
         print("WorkoutData LOAD: No data found for key 'characterXp'.");
       } else if (xpString.isEmpty || xpString == "{}") {
-        print("WorkoutData LOAD: Found key 'characterXp', but it's empty or an empty map string: '$xpString'");
+        print(
+          "WorkoutData LOAD: Found key 'characterXp', but it's empty or an empty map string: '$xpString'",
+        );
       } else {
         print("WorkoutData LOAD: Found data for 'characterXp': $xpString");
         try {
@@ -180,22 +240,32 @@ class WorkoutData with ChangeNotifier {
           print("WorkoutData LOAD: Successfully decoded 'characterXp' JSON.");
           decodedXpMap.forEach((key, value) {
             try {
-              final classEnum = VisionaryClass.values.firstWhere((e) => e.name == key);
+              final classEnum = VisionaryClass.values.firstWhere(
+                (e) => e.name == key,
+              );
               if (value is int) {
                 _characterXp[classEnum] = value;
                 print("WorkoutData LOAD: Loaded XP for $key: $value");
               } else {
-                print("WorkoutData LOAD: ERROR - XP value for $key is not an int: $value. Setting to 0.");
+                print(
+                  "WorkoutData LOAD: ERROR - XP value for $key is not an int: $value. Setting to 0.",
+                );
                 _characterXp[classEnum] = 0;
               }
             } catch (e) {
-              print("WorkoutData LOAD: ERROR processing _characterXp for key $key (value: $value): $e. Setting to 0.");
+              print(
+                "WorkoutData LOAD: ERROR processing _characterXp for key $key (value: $value): $e. Setting to 0.",
+              );
               // Attempt to find enum again just in case, though it should be caught by outer try-catch for malformed key.
               try {
-                final classEnum = VisionaryClass.values.firstWhere((e) => e.name == key);
+                final classEnum = VisionaryClass.values.firstWhere(
+                  (e) => e.name == key,
+                );
                 _characterXp[classEnum] = 0;
               } catch (_) {
-                print("WorkoutData LOAD: ERROR - Could not find VisionaryClass for key $key during error handling.");
+                print(
+                  "WorkoutData LOAD: ERROR - Could not find VisionaryClass for key $key during error handling.",
+                );
               }
             }
           });
