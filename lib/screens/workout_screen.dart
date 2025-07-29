@@ -6,7 +6,7 @@ import '../models/visionary_class.dart';
 import '../models/workout_entry.dart';
 import '../widgets/workout_input_dialog.dart';
 import '../logic/workout_data.dart'; // Ensure this is your global instance or provided
-import '../models/visionary_data.dart'; // For calculateLevelAndProgress and constants
+import '../logic/visionary_data.dart'; // For calculateLevelAndProgress and constants
 // import 'package:collection/collection.dart'; // Not strictly needed here anymore for this logic
 // import 'package:provider/provider.dart'; // UNCOMMENT if you set up Provider for workoutData
 

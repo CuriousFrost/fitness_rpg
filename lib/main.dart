@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'screens/main_menu.dart';
-import '../models/visionary_data.dart';
+import 'logic/visionary_data.dart';
 import '../logic/workout_data.dart';
 
 // 🔹 Add this:

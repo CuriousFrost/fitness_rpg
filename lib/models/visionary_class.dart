@@ -40,9 +40,6 @@ enum VisionaryClass {
   static VisionaryClass fromString(String? className) {
     // Made className nullable for safety
     if (className == null || className.trim().isEmpty) {
-      print(
-        "Warning: Received null or empty className. Defaulting to ${VisionaryClass.values.first.name}.",
-      );
       return VisionaryClass.values.first;
     }
     try {
@@ -50,9 +47,6 @@ enum VisionaryClass {
         (e) => e.name.toLowerCase() == className.toLowerCase().trim(),
       );
     } catch (e) {
-      print(
-        "Warning: Could not find VisionaryClass for name: '$className'. Defaulting to ${VisionaryClass.values.first.name}.",
-      );
       return VisionaryClass.values.first;
     }
   }

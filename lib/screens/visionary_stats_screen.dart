@@ -1,7 +1,7 @@
 // Converted version of your existing VisionaryStatsScreen to a StatefulWidget
 // Includes your original logic with automatic refresh via setState if needed
 
-import 'package:fitness_rpg/models/visionary_data.dart';
+import 'package:fitness_rpg/logic/visionary_data.dart';
 import 'package:flutter/material.dart';
 import '../models/workout_entry.dart';
 import 'package:fl_chart/fl_chart.dart';
@@ -92,9 +92,6 @@ class _VisionaryStatsScreenState extends State<VisionaryStatsScreen> {
 
   void _onWorkoutDataChanged() {
     // When workoutData notifies of a change, recalculate and rebuild
-    print(
-      "VisionaryStatsScreen: Detected change in workoutData, recalculating stats.",
-    );
     _calculateStatsAndUpdateUI();
   }
 
@@ -176,11 +173,6 @@ class _VisionaryStatsScreenState extends State<VisionaryStatsScreen> {
     // though for "current week" it's fine in initState.
     // final weekEnd = weekStart.add(const Duration(days: 6));
     // dateRange = ... (your formatDate logic)
-  }
-
-  // Helper for consistent day strings for the map keys
-  String _getDayString(int dayIndex) {
-    return ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][dayIndex];
   }
 
   @override

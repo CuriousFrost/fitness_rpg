@@ -1,7 +1,6 @@
 // visionary_data.dart
 import 'dart:convert';
 import 'dart:math';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../models/visionary_class.dart';
 import '../models/combat_stats.dart'; // Ensure this is correctly imported
 import 'package:flutter/services.dart' show rootBundle;
@@ -96,48 +95,12 @@ class VisionaryData {
     };
   }
 
-  static Future<void> save() async {
-    // final prefs = await SharedPreferences.getInstance();
-    // final xpJson = jsonEncode(classXp.map((k, v) => MapEntry(k.name, v))); // REMOVE
-    // final levelJson = jsonEncode(classLevel.map((k, v) => MapEntry(k.name, v))); // REMOVE
-    // await prefs.setString('classXp', xpJson); // REMOVE
-    // await prefs.setString('classLevel', levelJson); // REMOVE
-    print(
-      "VisionaryData.save() called - no classXp/classLevel to save anymore.",
-    );
-  }
+  static Future<void> save() async {}
 
-  static Future<void> load() async {
-    // final prefs = await SharedPreferences.getInstance();
-    // final xpJson = prefs.getString('classXp'); // REMOVE
-    // final levelJson = prefs.getString('classLevel'); // REMOVE
-    // if (xpJson != null && levelJson != null) { // REMOVE THIS BLOCK
-    //   ...
-    // }
-    print(
-      "VisionaryData.load() called - no classXp/classLevel to load anymore.",
-    );
-    // Ensure VisionaryClass values are still available if needed by other logic during load
-    // for (var c in VisionaryClass.values) {
-    //   // No longer initializing classXp[c] or classLevel[c] here
-    // }
-  }
-
-  // Static list of predefined VisionaryData instances
-  // Now using combatStatsMap to get the base stats
-  // ---- MODIFIED SECTION FOR DESCRIPTIONS AND PREDEFINED VISIONARIES ----
-
-  // Private static field to hold the loaded descriptions
+  static Future<void> load() async {}
   static Map<String, String> _loadedDescriptions = {};
-
-  // Public static getter for predefined visionaries.
-  // It's 'late final' because it will be initialized by _initializeVisionaries.
   static late final List<VisionaryData> predefinedVisionaries;
-
-  // A flag to ensure initialization happens only once.
-  static bool _isInitialized = false;
-
-  // Static method to load descriptions and initialize predefinedVisionaries
+  static final bool _isInitialized = false;
   static Future<void> initialize() async {
     if (_isInitialized) return; // Prevent re-initialization
 
@@ -151,7 +114,6 @@ class VisionaryData {
         (key, value) => MapEntry(key, value.toString()),
       );
     } catch (e) {
-      print("Error loading visionary descriptions: $e");
       // Handle error, maybe load with default empty descriptions
       _loadedDescriptions = {};
     }

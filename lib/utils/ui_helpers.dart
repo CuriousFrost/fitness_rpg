@@ -133,11 +133,12 @@ class _XpPopupOverlayState extends State<_XpPopupOverlay>
                   key: const ValueKey('xpBarContainer'),
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.black87.withOpacity(0.9),
+                    color: Colors.black87.withAlpha(199),
                     borderRadius: BorderRadius.circular(12),
                     boxShadow: [
                       const BoxShadow(
-                        color: Colors.black38,
+                        color: Colors
+                            .black38, // This one is fine, it's already a Color constant
                         blurRadius: 8,
                         offset: Offset(0, 4),
                       ),

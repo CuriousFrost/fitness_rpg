@@ -1,5 +1,6 @@
+import 'package:fitness_rpg/models/weapon_type.dart';
 import 'package:flutter/material.dart';
-import '../models/visionary_data.dart'; // Import VisionaryData
+import '../logic/visionary_data.dart'; // Import VisionaryData
 import '../models/visionary_class.dart';
 import '../models/combat_stats.dart';
 import './visionary_stats_screen.dart';
@@ -31,11 +32,14 @@ class VisionaryCombatStatsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Use visionaryData for stats and info
-    final CombatStats baseCombatStats = visionaryData.combatStats;
+    //final CombatStats baseCombatStats = visionaryData.combatStats;
     final String description = visionaryData.description;
-    final String weaponType = visionaryData.weaponType;
+    //final String weaponType = visionaryData.weaponType;
     final VisionaryClass classEnum = VisionaryClass.fromString(
       visionaryData.classType,
+    );
+    final WeaponType currentWeaponType = WeaponType.fromString(
+      visionaryData.weaponType,
     );
 
     return Scaffold(
@@ -100,17 +104,20 @@ class VisionaryCombatStatsScreen extends StatelessWidget {
             const SizedBox(height: 24),
             Row(
               children: [
+                // Class Type Tag (using colors from VisionaryClass enum)
                 _buildAttributeTag(
-                  // This is the tag for the Class Type
                   context,
                   'Class: ${classEnum.displayName}',
-                  classTypeForColor:
-                      classEnum, // <<< THIS IS CRUCIAL: Pass the enum here
+                  tagBackgroundColor: classEnum.classColor,
+                  tagTextColor: classEnum.classTextColor,
                 ),
                 const SizedBox(width: 12),
+                // Weapon Type Tag (using colors from WeaponType enum)
                 _buildAttributeTag(
                   context,
-                  'Weapon: ${visionaryData.weaponType}',
+                  'Weapon: ${currentWeaponType.displayName}', // Use displayName from WeaponType enum
+                  tagBackgroundColor: currentWeaponType.color,
+                  tagTextColor: currentWeaponType.textColor,
                 ), // Weapon tag, no color specified
               ],
             ),
@@ -130,7 +137,7 @@ class VisionaryCombatStatsScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Color.fromRGBO(0, 0, 0, 0.1), // For black with 10% opacity
             spreadRadius: 1,
             blurRadius: 3,
             offset: Offset(0, 2),
@@ -164,34 +171,45 @@ class VisionaryCombatStatsScreen extends StatelessWidget {
   Widget _buildAttributeTag(
     BuildContext context,
     String text, {
-    VisionaryClass? classTypeForColor,
+    Color?
+    tagBackgroundColor, // Optional: Specific background color for the tag
+    Color? tagTextColor, // Optional: Specific text color for the tag
   }) {
-    // Parameter name is important
-    Color backgroundColor;
-    Color textColor;
+    // Declare variables to hold the final colors to be used.
+    Color finalBackgroundColor;
+    Color finalTextColor;
 
-    if (classTypeForColor != null) {
-      // THIS IS THE CRUCIAL PART FOR USING THE ENUM'S COLORS
-      backgroundColor = classTypeForColor.classColor;
-      textColor = classTypeForColor.classTextColor;
+    // Check if specific colors for the tag were provided.
+    if (tagBackgroundColor != null && tagTextColor != null) {
+      // If both background and text colors are provided, use them.
+      finalBackgroundColor = tagBackgroundColor;
+      finalTextColor = tagTextColor;
     } else {
-      // Fallback for tags that aren't class-specific (like weapon type)
-      backgroundColor = Theme.of(context).colorScheme.tertiaryContainer;
-      textColor = Theme.of(context).colorScheme.onTertiaryContainer;
+      // If specific colors are not provided (or only one is),
+      // fall back to using default colors from the current theme.
+      // This makes the tag still look good even if custom colors aren't set.
+      finalBackgroundColor = Theme.of(context).colorScheme.tertiaryContainer;
+      finalTextColor = Theme.of(context).colorScheme.onTertiaryContainer;
     }
 
+    // Return a Container widget styled as a rounded tag.
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      padding: const EdgeInsets.symmetric(
+        horizontal: 12,
+        vertical: 6,
+      ), // Inner padding
       decoration: BoxDecoration(
-        color: backgroundColor, // Background color is applied here
-        borderRadius: BorderRadius.circular(20),
+        color: finalBackgroundColor, // Apply the determined background color
+        borderRadius: BorderRadius.circular(
+          20,
+        ), // Make it a rounded rectangle (pill shape)
       ),
       child: Text(
-        text,
+        text, // The text content of the tag
         style: TextStyle(
           fontSize: 14,
-          fontWeight: FontWeight.w500,
-          color: textColor, // Text color is applied here
+          fontWeight: FontWeight.w500, // Slightly bold text
+          color: finalTextColor, // Apply the determined text color
         ),
       ),
     );

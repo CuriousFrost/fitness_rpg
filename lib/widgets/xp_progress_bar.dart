@@ -1,6 +1,6 @@
 // xp_progress_bar.dart (Modified)
 import 'package:flutter/material.dart';
-import '../models/visionary_data.dart';
+import '../logic/visionary_data.dart';
 
 // No longer need 'dart:math' here if formulas are external
 class XPProgressBar extends StatelessWidget {

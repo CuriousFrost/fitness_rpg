@@ -1,7 +1,7 @@
 // visionary_screen.dart
 
 import 'package:flutter/material.dart';
-import '../models/visionary_data.dart';
+import '../logic/visionary_data.dart';
 import '../screens/visionary_combat_stats_screen.dart';
 import '../models/visionary_class.dart';
 import '../logic/workout_data.dart'; // Import WorkoutData

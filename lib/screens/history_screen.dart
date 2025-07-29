@@ -1,6 +1,5 @@
 //history_screen.dart
 import 'package:flutter/material.dart';
-import '../models/visionary_data.dart';
 import '../models/workout_entry.dart';
 import '../models/visionary_class.dart';
 import '../logic/workout_data.dart';
