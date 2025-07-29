@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'visionary_screen.dart';
 import 'workout_screen.dart';
 import 'history_screen.dart';
+import '../screens/storybook_screen.dart';
+import '../game/visionaries_of_sol_game.dart';
 
 class MainMenuScreen extends StatelessWidget {
   const MainMenuScreen({super.key});
@@ -48,8 +50,10 @@ class MainMenuScreen extends StatelessWidget {
                 );
               }),
               _buildMenuButton('Storybook', () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Story mode coming soon!')),
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const StorybookScreen()),
+
                 );
               }),
               _buildMenuButton('Team Builder', () {
