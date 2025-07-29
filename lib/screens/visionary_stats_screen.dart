@@ -177,6 +177,16 @@ class _VisionaryStatsScreenState extends State<VisionaryStatsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    const List<WorkoutType> distanceWorkoutTypes = [
+      WorkoutType.running,
+      WorkoutType.walking,
+      WorkoutType.biking,
+      WorkoutType.stairs,
+    ];
+    final List<MapEntry<WorkoutType, double>> filteredDistanceEntries =
+        distanceByType.entries.where((entry) {
+          return distanceWorkoutTypes.contains(entry.key) && entry.value > 0;
+        }).toList();
     return Scaffold(
       appBar: AppBar(title: Text('${widget.visionary.displayName} Stats')),
       body: SingleChildScrollView(
@@ -218,45 +228,51 @@ class _VisionaryStatsScreenState extends State<VisionaryStatsScreen> {
                 );
               }).toList(),
             ),
-            const SizedBox(height: 24),
-            const Text(
-              'Cardio Distance Tracker',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 12),
-            GridView.count(
-              crossAxisCount: 4,
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              crossAxisSpacing: 8,
-              mainAxisSpacing: 8,
-              children: distanceByType.entries.map((entry) {
-                String label = entry.key == WorkoutType.stairs
-                    ? '${entry.value.toInt()} steps'
-                    : '${entry.value.toStringAsFixed(1)} km';
-                return Container(
-                  decoration: BoxDecoration(
-                    color: Colors.teal[700],
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(entry.key.icon, color: Colors.white),
-                      const SizedBox(height: 6),
-                      Text(
-                        label,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 12,
+            if (filteredDistanceEntries.isNotEmpty) ...[
+              // Only show if there are entries
+              const Text(
+                'Cardio Distance Tracker',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 12),
+              GridView.count(
+                crossAxisCount: 4,
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                crossAxisSpacing: 8,
+                mainAxisSpacing: 8,
+                // Use the filtered list here
+                children: filteredDistanceEntries.map((entry) {
+                  // <--- MAKE SURE THIS USES filteredDistanceEntries
+                  String label = entry.key == WorkoutType.stairs
+                      ? '${entry.value.toInt()} steps'
+                      : '${entry.value.toStringAsFixed(1)} km';
+                  return Container(
+                    decoration: BoxDecoration(
+                      color: Colors.teal[700],
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(entry.key.icon, color: Colors.white),
+                        const SizedBox(height: 6),
+                        Text(
+                          label,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                );
-              }).toList(),
-            ),
-            const SizedBox(height: 24),
+                      ],
+                    ),
+                  );
+                }).toList(),
+              ),
+              const SizedBox(
+                height: 24,
+              ), // This SizedBox is part of the conditional section
+            ],
             Text(
               '7-Day XP Overview ($dateRange)',
               style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
