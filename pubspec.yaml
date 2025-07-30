@@ -39,7 +39,7 @@ dependencies:
   cupertino_icons: ^1.0.8
   fl_chart: ^1.0.0
   flame: ^1.30.1
-  flame_tiled: ^1.16.0
+  flame_tiled: ^3.0.5
 
 dev_dependencies:
   flutter_test:
@@ -86,9 +86,7 @@ flutter:
     - assets/images/game/player/mossborn_sprite_sheet.png
     - assets/images/game/player/farseer_sprite_sheet.png
     - assets/images/game/player/realist_sprite_sheet.png
-    - assets/maps/intro_scene.tmx
-    - assets/maps/test_tiles.tsx
-    - assets/maps/story_tiles.png
+    - assets/maps/
 
 
 

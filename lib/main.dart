@@ -2,12 +2,15 @@ import 'package:flutter/material.dart';
 import 'screens/main_menu.dart';
 import 'logic/visionary_data.dart';
 import '../logic/workout_data.dart';
+import 'package:flame/flame.dart';
+
 
 // 🔹 Add this:
 final PageStorageBucket pageStorageBucket = PageStorageBucket();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized(); // Crucial for SharedPreferences before runApp
+  Flame.images.prefix = '';
   await workoutData
       .load(); // Make sure 'workoutData' is the SAME instance used throughout your app
   await VisionaryData.load(); // If it has a static load method
