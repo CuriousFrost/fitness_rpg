@@ -39,6 +39,7 @@ dependencies:
   cupertino_icons: ^1.0.8
   fl_chart: ^1.0.0
   flame: ^1.30.1
+  flame_tiled: ^1.16.0
 
 dev_dependencies:
   flutter_test:
@@ -68,6 +69,7 @@ flutter:
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
   assets:
+
     - assets/images/main_menu_graphic_and_title.png
     - assets/images/main_menu_background_option_2.png
     - assets/images/main_menu_background_option_3.png
@@ -84,6 +86,12 @@ flutter:
     - assets/images/game/player/mossborn_sprite_sheet.png
     - assets/images/game/player/farseer_sprite_sheet.png
     - assets/images/game/player/realist_sprite_sheet.png
+    - assets/maps/intro_scene.tmx
+    - assets/maps/test_tiles.tsx
+    - assets/maps/story_tiles.png
+
+
+
 
   fonts:
     - family: Kadera

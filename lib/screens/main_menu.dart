@@ -3,7 +3,7 @@ import 'visionary_screen.dart';
 import 'workout_screen.dart';
 import 'history_screen.dart';
 import '../screens/storybook_screen.dart';
-import '../game/visionaries_of_sol_game.dart';
+import '../game/story_map_game.dart';
 
 class MainMenuScreen extends StatelessWidget {
   const MainMenuScreen({super.key});
@@ -52,7 +52,7 @@ class MainMenuScreen extends StatelessWidget {
               _buildMenuButton('Storybook', () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const StorybookScreen()),
+                  MaterialPageRoute(builder: (context) => const StoryBookScreen()),
 
                 );
               }),
