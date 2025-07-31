@@ -10,7 +10,7 @@ final PageStorageBucket pageStorageBucket = PageStorageBucket();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized(); // Crucial for SharedPreferences before runApp
-  Flame.images.prefix = '';
+  //Flame.images.prefix = '';
   await workoutData
       .load(); // Make sure 'workoutData' is the SAME instance used throughout your app
   await VisionaryData.load(); // If it has a static load method
